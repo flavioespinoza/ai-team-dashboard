@@ -13,16 +13,17 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 		return (
 			<button
 				className={cn(
-					'inline-flex items-center justify-center rounded-md font-medium transition-colors',
+					'inline-flex items-center justify-center rounded-md font-medium transition-all duration-200 ease-in-out',
 					'focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none',
 					'disabled:pointer-events-none disabled:opacity-50',
+					'cursor-pointer', // add pointer
 					{
 						// Variants
-						'bg-blue-600 text-white hover:bg-blue-700 focus-visible:ring-blue-600':
+						'bg-blue-600 text-white hover:bg-blue-700 hover:opacity-90 focus-visible:ring-blue-600':
 							variant === 'default',
-						'hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-gray-800 dark:hover:text-gray-100':
+						'hover:bg-gray-100 hover:text-gray-900 hover:opacity-90 dark:hover:bg-gray-600 dark:hover:text-gray-100':
 							variant === 'ghost',
-						'border border-gray-300 bg-transparent hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-800':
+						'border border-gray-300 bg-transparent hover:bg-gray-100 hover:opacity-90 dark:border-gray-700 dark:hover:bg-gray-700':
 							variant === 'outline',
 						// Sizes
 						'h-8 px-3 text-sm': size === 'sm',

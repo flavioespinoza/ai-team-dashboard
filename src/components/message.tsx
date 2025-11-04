@@ -111,7 +111,7 @@ export function MessageComponent({ message, previousMessage }: MessageProps) {
 							disabled={isSaving || saved}
 							className="text-xs"
 						>
-							{saved ? 'Saved' : isSaving ? 'Saving...' : 'Save to KB'}
+							{saved ? 'Saved' : isSaving ? 'Saving...' : 'Save to Knowledge Base'}
 						</Button>
 					)}
 				</div>

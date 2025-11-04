@@ -1,31 +1,34 @@
 // Date: 2025-11-04
-// Version: 1.0.0
+// Version: 1.2.0
 
 'use client'
 
 import { FormEvent, useEffect, useRef, useState } from 'react'
+import { MessageSquarePlus } from 'lucide-react'
+import { useAtom } from 'jotai'
 import { askAssistant } from '@/app/actions'
-import { isLoadingState, messagesState } from '@/state/atoms'
-import { useAtom, useAtomValue } from 'jotai'
-import { MessageComponent } from './message'
-import { Button } from './ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
-import { Textarea } from './ui/input'
-import { ScrollArea } from './ui/scroll-area'
+import { MessageComponent } from '@/components/message'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { Textarea } from '@/components/ui/input'
+import { messagesState } from '@/state/atoms'
 
 export function ChatInterface() {
 	const [messages, setMessages] = useAtom(messagesState)
-	const isLoading = useAtomValue(isLoadingState)
 	const [question, setQuestion] = useState('')
-	const [error, setError] = useState<string | null>(null)
 	const [isSubmitting, setIsSubmitting] = useState(false)
+	const [error, setError] = useState<string | null>(null)
 	const scrollRef = useRef<HTMLDivElement>(null)
 	const textareaRef = useRef<HTMLTextAreaElement>(null)
 
 	// Auto-scroll to bottom when new messages arrive
 	useEffect(() => {
 		if (scrollRef.current) {
-			scrollRef.current.scrollTop = scrollRef.current.scrollHeight
+			const scrollElement = scrollRef.current.querySelector('[data-radix-scroll-area-viewport]')
+			if (scrollElement) {
+				scrollElement.scrollTop = scrollElement.scrollHeight
+			}
 		}
 	}, [messages])
 
@@ -84,10 +87,29 @@ export function ChatInterface() {
 		}
 	}
 
+	const handleNewChat = () => {
+		setMessages([])
+		setQuestion('')
+		setError(null)
+		textareaRef.current?.focus()
+	}
+
 	return (
 		<Card className="flex h-full flex-col">
 			<CardHeader>
-				<CardTitle>AI Assistant</CardTitle>
+				<div className="flex items-center justify-between">
+					<CardTitle>AI Assistant</CardTitle>
+					<Button
+						variant="outline"
+						size="sm"
+						onClick={handleNewChat}
+						disabled={messages.length === 0}
+						className="gap-2"
+					>
+						<MessageSquarePlus className="h-4 w-4" />
+						New Chat
+					</Button>
+				</div>
 			</CardHeader>
 			<CardContent className="flex flex-1 flex-col gap-4 overflow-hidden">
 				{/* Messages area */}

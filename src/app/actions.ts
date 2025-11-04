@@ -1,5 +1,5 @@
 // Date: 2025-11-04
-// Version: 1.0.0
+// Version: 1.1.0
 
 'use server'
 
@@ -64,7 +64,7 @@ export async function askAssistant(question: string): Promise<ServerActionRespon
 		if (error instanceof z.ZodError) {
 			return {
 				success: false,
-				error: error.errors[0]?.message || 'Invalid question format'
+				error: error.issues[0]?.message || 'Invalid question format'
 			}
 		}
 
@@ -121,7 +121,7 @@ export async function saveToKnowledgeBase(
 		if (error instanceof z.ZodError) {
 			return {
 				success: false,
-				error: error.errors[0]?.message || 'Invalid input format'
+				error: error.issues[0]?.message || 'Invalid input format'
 			}
 		}
 
@@ -153,8 +153,8 @@ export async function getKnowledgeBase(): Promise<ServerActionResponse<IKnowledg
 		// Convert ObjectId to string
 		const plainEntries = entries.map((entry) => ({
 			...entry,
-			_id: entry._id.toString()
-		})) as IKnowledgeBase[]
+			_id: entry._id?.toString() || ''
+		})) as unknown as IKnowledgeBase[]
 
 		return {
 			success: true,
