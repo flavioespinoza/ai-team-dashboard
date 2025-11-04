@@ -56,7 +56,7 @@ An Internal Team Dashboard with AI Assistant built for a coding challenge. This 
 - **UI Library**: React 19
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS 4
-- **State Management**: Recoil.js
+- **State Management**: Jotai (atom-based, React 19 compatible)
 - **Database**: MongoDB with Mongoose
 - **AI API**: OpenAI API (GPT-4o-mini)
 - **Markdown**: react-markdown
@@ -70,7 +70,7 @@ ai-team-dashboard/
 ├── src/
 │   ├── app/
 │   │   ├── actions.ts          # Server Actions for AI and DB operations
-│   │   ├── layout.tsx          # Root layout with RecoilRoot
+│   │   ├── layout.tsx          # Root layout with Jotai Provider
 │   │   ├── page.tsx            # Main dashboard page
 │   │   └── globals.css         # Global styles
 │   ├── components/
@@ -84,13 +84,13 @@ ai-team-dashboard/
 │   │   ├── message.tsx         # Individual message component
 │   │   ├── knowledge-base-sidebar.tsx  # Knowledge base list
 │   │   ├── knowledge-base-item.tsx     # Individual KB item
-│   │   └── providers.tsx       # Recoil provider wrapper
+│   │   └── providers.tsx       # Jotai provider wrapper
 │   ├── db/
 │   │   ├── schema.ts           # Mongoose schema
 │   │   └── index.ts            # MongoDB connection
 │   ├── state/
-│   │   ├── atoms.ts            # Recoil atoms
-│   │   └── selectors.ts        # Recoil selectors
+│   │   ├── atoms.ts            # Jotai atoms
+│   │   └── selectors.ts        # Jotai derived atoms
 │   ├── types/
 │   │   └── global.d.ts         # TypeScript global types
 │   └── lib/
@@ -194,15 +194,18 @@ Run `npm run clean` to format all code according to these rules.
 
 ## Design Decisions & Architecture
 
-### Why Recoil for State Management?
+### Why Jotai for State Management?
 
-Recoil was chosen over Redux or Context API for several reasons:
+Jotai was chosen over Redux, Context API, or Recoil for several reasons:
 
-- **Minimal boilerplate**: Simple atom-based state definition
-- **Excellent TypeScript support**: Type-safe state management
+- **React 19 compatibility**: Full support for React 19 (Recoil has compatibility issues)
+- **Minimal boilerplate**: Simple atom-based state definition with no keys required
+- **Excellent TypeScript support**: Type-safe state management out of the box
 - **Granular updates**: Components only re-render when their specific atoms change
-- **Computed values**: Selectors for derived state (sorted, filtered lists)
+- **Computed values**: Derived atoms for computed state (sorted, filtered lists)
+- **Smaller bundle size**: More lightweight than Recoil
 - **React-first**: Designed specifically for React with hooks
+- **Better performance**: Optimized for modern React features
 
 ### Server Actions vs API Routes
 
