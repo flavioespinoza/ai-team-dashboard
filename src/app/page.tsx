@@ -40,8 +40,8 @@ export default function Home() {
 	return (
 		<div className="flex min-h-screen flex-col bg-[var(--background)] text-[var(--foreground)]">
 			{/* Header */}
-			<header className="border-b border-gray-200 bg-[var(--background)]">
-				<div className="container mx-auto px-4 py-4">
+			<header className="border-b border-gray-200 card rounded-none!">
+				<div className="container mx-auto px-10 py-4">
 					<h1 className="text-2xl font-bold text-gray-900">AI Team Dashboard</h1>
 					<p className="text-sm text-gray-600">Ask questions and build your knowledge base</p>
 				</div>

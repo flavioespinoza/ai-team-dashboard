@@ -17,7 +17,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(({ className, type, ...pr
 		<input
 			type={type}
 			className={cn(
-				'flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm',
+				'flex h-10 w-full rounded-md border-2 border-gray-300 bg-white px-3 py-2 text-sm',
 				'focus-visible:ring-primary-600 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none',
 				'disabled:cursor-not-allowed disabled:opacity-50',
 				className
@@ -73,7 +73,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(({ className, ..
 			rows={1}
 			className={cn(
 				// Start visually at 40px, prevent manual resize/scrollbars, and keep box sizing stable
-				'flex min-h-[40px] w-full resize-none overflow-hidden rounded-md border border-gray-300 bg-white px-3 py-2 text-sm transition-[height] duration-150 ease-in-out',
+				'flex min-h-[40px] w-full resize-none overflow-hidden rounded-md border-2 border-gray-300 bg-white px-3 py-2 text-sm transition-[height] duration-150 ease-in-out',
 				'focus-visible:ring-primary-400 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none',
 				'disabled:cursor-not-allowed disabled:opacity-50',
 				'box-border',
