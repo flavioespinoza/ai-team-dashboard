@@ -166,3 +166,19 @@ body {
 .message-user {
 	@apply bg-primary-500 rounded-lg px-4 py-2.5 text-white;
 }
+
+/* =============================
+   🪶 Tooltips (anchored top-right)
+   ============================= */
+.tooltip {
+	@apply relative inline-block;
+}
+
+.tooltip-text {
+	@apply invisible absolute -top-4 right-full translate-y-[-4px] whitespace-nowrap rounded-md bg-gray-800 px-2.5 py-1 text-xs text-white opacity-0 transition-all duration-150;
+}
+
+.tooltip:hover .tooltip-text,
+.tooltip:focus-within .tooltip-text {
+	@apply visible translate-y-0 opacity-100;
+}

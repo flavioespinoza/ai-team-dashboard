@@ -10,6 +10,7 @@ import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism'
 import { deleteKnowledgeBaseItem, togglePinItem } from '@/app/actions'
 import { type KnowledgeBaseItem, knowledgeBaseState } from '@/state/atoms'
 import { useSetAtom } from 'jotai'
+import { Pin, PinOff, Trash2 } from 'lucide-react'
 import { Badge } from './ui/badge'
 import { Button } from './ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
@@ -72,39 +73,45 @@ export function KnowledgeBaseItemComponent({ item }: KnowledgeBaseItemProps) {
 				<div className="flex items-start justify-between gap-2">
 					<CardTitle className="line-clamp-2 text-base">{item.question}</CardTitle>
 					<div className="flex gap-1">
-						<Button
+						<div className='tooltip'>
+							<Button
 							size="sm"
 							variant="ghost"
 							onClick={handleTogglePin}
 							disabled={isTogglingPin}
-							className="h-8 w-8 p-0"
+							className="h-8 w-8 p-1 hover:bg-gray-200 hover:text-gray-700"
 						>
-							{item.isPinned ? '📌' : '📍'}
+							{item.isPinned ? <PinOff /> : <Pin />}
 						</Button>
+						{item.isPinned ? <span className="tooltip-text">Unpin Knowledge Base</span> : <span className="tooltip-text">Pin Knowledge Base</span>}
+						</div>
 
 						{/* ✅ DeleteConfirmDialog replaces confirm() */}
-						<DeleteConfirmDialog
-							onConfirm={handleDelete}
-							title="Delete Knowledge Base Item?"
-							description={`Are you sure you want to delete “${item.question}”? This action cannot be undone.`}
-							trigger={
-								<Button
-									size="sm"
-									variant="ghost"
-									disabled={isDeleting}
-									className="h-8 w-8 p-0 text-red-600 hover:bg-red-50 hover:text-red-700"
-								>
-									🗑️
-								</Button>
-							}
-						/>
+						<div className="tooltip">
+							<DeleteConfirmDialog
+								onConfirm={handleDelete}
+								title="Delete Knowledge Base Item?"
+								description={`Are you sure you want to delete “${item.question}”? This action cannot be undone.`}
+								trigger={
+									<Button
+										size="sm"
+										variant="ghost"
+										disabled={isDeleting}
+										className="h-8 w-8 p-1 text-red-600 hover:bg-red-200 hover:text-red-700"
+									>
+										<Trash2 />
+									</Button>
+								}
+							/>
+							<span className="tooltip-text">Delete Knowledge Base</span>
+						</div>
 					</div>
 				</div>
 
 				<div className="flex flex-wrap gap-2">
-					{item.isPinned && <Badge variant="warning">Pinned</Badge>}
+					{item.isPinned && <Badge variant="success">Pinned</Badge>}
 					{item.tags?.map((tag) => (
-						<Badge key={tag} variant="secondary">
+						<Badge key={tag} variant="primary">
 							{tag}
 						</Badge>
 					))}
