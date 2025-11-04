@@ -20,7 +20,7 @@ interface MarkdownWithCodeProps {
  * @returns {JSX.Element} The rendered Markdown content.
  */
 const MarkdownWithCode: React.FC<MarkdownWithCodeProps> = ({ markdown }) => {
-	const CodeBlock = ({ node, inline, className, children, ...props }: any): JSX.Element => {
+	const CodeBlock = ({ node, inline, className, children, ...props }: any): React.JSX.Element => {
 		const match = /language-(\w+)/.exec(className || '')
 		const language = match ? match[1] : null
 		const [copied, setCopied] = useState(false)

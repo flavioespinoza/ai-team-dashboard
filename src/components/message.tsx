@@ -4,10 +4,10 @@
 'use client'
 
 import { useState } from 'react'
+import { useSetAtom } from 'jotai'
 import ReactMarkdown from 'react-markdown'
 import { saveToKnowledgeBase } from '@/app/actions'
 import { type Message, knowledgeBaseState } from '@/state/atoms'
-import { useSetAtom } from 'jotai'
 import { Button } from './ui/button'
 
 interface MessageProps {
@@ -45,18 +45,19 @@ export function MessageComponent({ message, previousMessage }: MessageProps) {
 		minute: '2-digit'
 	})
 
+	const isUser = message.type === 'user'
+
 	return (
-		<div className={`flex gap-3 ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
+		<div className={`flex gap-3 ${isUser ? 'justify-end' : 'justify-start'}`}>
 			<div
 				className={`max-w-[80%] rounded-lg p-4 ${
-					message.type === 'user'
+					isUser
 						? 'bg-blue-600 text-white'
 						: 'bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-100'
 				}`}
 			>
 				<div className="mb-2">
 					<ReactMarkdown
-						
 						components={{
 							p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
 							code: ({ children }) => (
@@ -76,13 +77,13 @@ export function MessageComponent({ message, previousMessage }: MessageProps) {
 				</div>
 				<div className="flex items-center justify-between gap-2">
 					<span className="text-xs opacity-70">{timestamp}</span>
-					{message.type === 'assistant' && previousMessage && (
+					{!isUser && previousMessage && (
 						<Button
 							size="sm"
 							variant="ghost"
 							onClick={handleSave}
 							disabled={isSaving || saved}
-							className={`text-xs ${message.type === 'user' ? 'text-white hover:text-white' : ''}`}
+							className="text-xs"
 						>
 							{saved ? 'Saved' : isSaving ? 'Saving...' : 'Save to KB'}
 						</Button>
