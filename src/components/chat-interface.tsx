@@ -4,15 +4,15 @@
 'use client'
 
 import { FormEvent, useEffect, useRef, useState } from 'react'
-import { MessageSquarePlus } from 'lucide-react'
-import { useAtom } from 'jotai'
 import { askAssistant } from '@/app/actions'
 import { MessageComponent } from '@/components/message'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { ScrollArea } from '@/components/ui/scroll-area'
 import { Textarea } from '@/components/ui/input'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import { messagesState } from '@/state/atoms'
+import { useAtom } from 'jotai'
+import { MessageSquarePlus } from 'lucide-react'
 
 export function ChatInterface() {
 	const [messages, setMessages] = useAtom(messagesState)
@@ -130,7 +130,7 @@ export function ChatInterface() {
 						)}
 						{isSubmitting && (
 							<div className="flex justify-start">
-								<div className="max-w-[80%] rounded-lg bg-gray-100 p-4 text-gray-900 dark:bg-gray-800 dark:text-gray-100">
+								<div className="max-w-[80%] rounded-lg bg-[var(--surface)] bg-gray-100 p-4 text-gray-900">
 									<div className="flex items-center gap-2">
 										<div className="h-2 w-2 animate-pulse rounded-full bg-gray-600"></div>
 										<div className="animation-delay-200 h-2 w-2 animate-pulse rounded-full bg-gray-600"></div>
@@ -144,11 +144,7 @@ export function ChatInterface() {
 				</ScrollArea>
 
 				{/* Error message */}
-				{error && (
-					<div className="rounded-md bg-red-50 p-3 text-sm text-red-800 dark:bg-red-900/20 dark:text-red-200">
-						{error}
-					</div>
-				)}
+				{error && <div className="rounded-md bg-red-50 p-3 text-sm text-red-800">{error}</div>}
 
 				{/* Input area */}
 				<form onSubmit={handleSubmit} className="flex gap-2">
@@ -161,7 +157,12 @@ export function ChatInterface() {
 						className="min-h-[80px] resize-none"
 						disabled={isSubmitting}
 					/>
-					<Button variant="primary" type="submit" disabled={!question.trim() || isSubmitting} className="self-end">
+					<Button
+						variant="primary"
+						type="submit"
+						disabled={!question.trim() || isSubmitting}
+						className="self-end"
+					>
 						{isSubmitting ? 'Sending...' : 'Ask'}
 					</Button>
 				</form>

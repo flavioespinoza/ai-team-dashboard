@@ -1,75 +1,168 @@
 @import 'tailwindcss';
 
+/* ----------------------------------------------------
+   Light foundation
+---------------------------------------------------- */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+	/* soft cool gray background */
+	--background: #ced1c9; /* soft cool gray background */
+	--foreground: #0f172a; /* slate-900 text */
+	--surface: #ffffff; /* card/panel background */
+	--border: #e2e8f0; /* subtle card borders */
+	--muted: #64748b; /* slate-500 text for secondary */
 }
 
-/* Tailwind v4 source of truth */
-@theme inline {
-  /* base text/background */
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+/* ----------------------------------------------------
+   Tailwind v4 inline theme tokens
+---------------------------------------------------- */
+@theme {
+	/* Base text/background */
+	--color-background: var(--background);
+	--color-foreground: var(--foreground);
+	--color-surface: var(--surface);
+	--color-border: var(--border);
 
-  /* PRIMARY = cblue */
-  --color-primary-50:  #f4f8fb;
-  --color-primary-100: #e8f0f6;
-  --color-primary-200: #cddfea;
-  --color-primary-300: #a1c4d8;
-  --color-primary-400: #6ea5c2;
-  --color-primary-500: #4c8bab;  /* <- cblue */
-  --color-primary-600: #3f7699;  /* darker hover */
-  --color-primary-700: #366582;
-  --color-primary-800: #2e566e;
-  --color-primary-900: #284a5e;
+	/* PRIMARY — cblue */
+	--color-primary-50: #f4f8fb;
+	--color-primary-100: #e8f0f6;
+	--color-primary-200: #cddfea;
+	--color-primary-300: #a1c4d8;
+	--color-primary-400: #6ea5c2;
+	--color-primary-500: #4c8bab;
+	--color-primary-600: #3f7699;
+	--color-primary-700: #366582;
+	--color-primary-800: #2e566e;
+	--color-primary-900: #284a5e;
 
-  /* SECONDARY = hotpink */
-  --color-secondary-50:  #fff1f3;
-  --color-secondary-100: #ffe0e5;
-  --color-secondary-200: #ffc5cf;
-  --color-secondary-300: #ff9dad;
-  --color-secondary-400: #ff657f;
-  --color-secondary-500: #fe3557; /* <- hotpink */
-  --color-secondary-600: #ec163a; /* darker hover */
-  --color-secondary-700: #c70e2d;
-  --color-secondary-800: #a41029;
-  --color-secondary-900: #881427;
+	/* SECONDARY — hotpink */
+	--color-secondary-50: #fff1f3;
+	--color-secondary-100: #ffe0e5;
+	--color-secondary-200: #ffc5cf;
+	--color-secondary-300: #ff9dad;
+	--color-secondary-400: #ff657f;
+	--color-secondary-500: #fe3557;
+	--color-secondary-600: #ec163a;
+	--color-secondary-700: #c70e2d;
+	--color-secondary-800: #a41029;
+	--color-secondary-900: #881427;
 
-  /* TERTIARY = sage */
-  --color-tertiary-50:  #f4f5f4;
-  --color-tertiary-100: #e6e8e3;
-  --color-tertiary-200: #ced1c9;
-  --color-tertiary-300: #aab1a4;
-  --color-tertiary-400: #808a78;
-  --color-tertiary-500: #636e5b; /* <- sage */
-  --color-tertiary-600: #4b5645; /* darker hover */
-  --color-tertiary-700: #3c4438;
-  --color-tertiary-800: #31372e;
-  --color-tertiary-900: #292e26;
+	/* TERTIARY — sage */
+	--color-tertiary-50: #f4f5f4;
+	--color-tertiary-100: #e6e8e3;
+	--color-tertiary-200: #ced1c9;
+	--color-tertiary-300: #aab1a4;
+	--color-tertiary-400: #808a78;
+	--color-tertiary-500: #636e5b;
+	--color-tertiary-600: #4b5645;
+	--color-tertiary-700: #3c4438;
+	--color-tertiary-800: #31372e;
+	--color-tertiary-900: #292e26;
 
-  /* optional: separate danger that matches hotpink */
-  --color-danger-500: #fe3557;
-  --color-danger-600: #ec163a;
+	/* Danger alias */
+	--color-danger-500: #fe3557;
+	--color-danger-600: #ec163a;
 
-  /* fonts */
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+	/* Fonts */
+	--font-sans: var(--font-geist-sans);
+	--font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/* ----------------------------------------------------
+   Base body styling
+---------------------------------------------------- */
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-sans, Arial, Helvetica, sans-serif);
+	background: var(--foo);
+	color: var(--foreground);
+	font-family: var(--font-sans, 'Inter', Arial, Helvetica, sans-serif);
+	@apply antialiased transition-colors duration-200;
 }
 
-/* markdown helpers */
-.markdown-parent-element > * { display:block !important; margin-bottom:20px !important; }
-.markdown-parent-element > ol > li,
-.markdown-parent-element > ul > li { display:block !important; margin-bottom:20px !important; }
+/* ----------------------------------------------------
+   Component utility classes
+---------------------------------------------------- */
+
+/* === Layout containers === */
+.card {
+	@apply rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm;
+}
+
+.card-header {
+	@apply border-b border-[var(--color-border)] px-5 py-3;
+}
+
+.card-title {
+	@apply text-base font-semibold text-[var(--color-foreground)];
+}
+
+.card-content {
+	@apply px-5 py-4;
+}
+
+/* === Buttons === */
+.btn {
+	@apply inline-flex items-center justify-center rounded-md font-medium transition-all duration-200 ease-in-out focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50;
+}
+
+.btn-primary {
+	@apply bg-primary-500 hover:bg-primary-600 focus-visible:ring-primary-500 text-white;
+}
+
+.btn-secondary {
+	@apply bg-secondary-500 hover:bg-secondary-600 focus-visible:ring-secondary-500 text-white;
+}
+
+.btn-tertiary {
+	@apply bg-tertiary-500 hover:bg-tertiary-600 focus-visible:ring-tertiary-500 text-white;
+}
+
+.btn-outline {
+	@apply border border-[var(--color-border)] bg-transparent text-[var(--color-foreground)] hover:bg-gray-100 focus-visible:ring-gray-300;
+}
+
+.btn-ghost {
+	@apply bg-transparent text-[var(--color-foreground)] hover:bg-gray-100;
+}
+
+.btn-danger {
+	@apply bg-danger-500 hover:bg-danger-600 focus-visible:ring-danger-500 text-white;
+}
+
+/* === Badges === */
+.badge {
+	@apply inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium;
+}
+
+.badge-primary {
+	@apply bg-primary-100 text-primary-800;
+}
+
+.badge-secondary {
+	@apply bg-secondary-100 text-secondary-800;
+}
+
+.badge-tertiary {
+	@apply bg-tertiary-100 text-tertiary-800;
+}
+
+.badge-warning {
+	@apply bg-yellow-100 text-yellow-800;
+}
+
+/* === Inputs === */
+.input {
+	@apply focus:ring-primary-500 focus:border-primary-500 w-full rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-foreground)] placeholder-gray-400 focus:ring-2;
+}
+
+/* === Text / muted === */
+.text-muted {
+	color: var(--muted);
+}
+
+/* === Chat bubbles === */
+.message-ai {
+	@apply rounded-lg bg-gray-100 px-4 py-2.5 text-gray-900;
+}
+
+.message-user {
+	@apply bg-primary-500 rounded-lg px-4 py-2.5 text-white;
+}

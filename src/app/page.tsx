@@ -38,14 +38,12 @@ export default function Home() {
 	}, [setKnowledgeBase])
 
 	return (
-		<div className="flex min-h-screen flex-col bg-gray-50 dark:bg-gray-900">
+		<div className="flex min-h-screen flex-col bg-[var(--background)] text-[var(--foreground)]">
 			{/* Header */}
-			<header className="border-b border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-950">
+			<header className="border-b border-gray-200 bg-[var(--background)]">
 				<div className="container mx-auto px-4 py-4">
-					<h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">AI Team Dashboard</h1>
-					<p className="text-sm text-gray-600 dark:text-gray-400">
-						Ask questions and build your knowledge base
-					</p>
+					<h1 className="text-2xl font-bold text-gray-900">AI Team Dashboard</h1>
+					<p className="text-sm text-gray-600">Ask questions and build your knowledge base</p>
 				</div>
 			</header>
 
@@ -55,12 +53,12 @@ export default function Home() {
 					<div className="flex flex-1 items-center justify-center">
 						<div className="text-center">
 							<div className="mb-4 h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-blue-600"></div>
-							<p className="text-gray-600 dark:text-gray-400">Loading...</p>
+							<p className="text-gray-600">Loading...</p>
 						</div>
 					</div>
 				) : error ? (
 					<div className="flex flex-1 items-center justify-center">
-						<div className="rounded-lg bg-red-50 p-4 text-red-800 dark:bg-red-900/20 dark:text-red-200">
+						<div className="rounded-lg bg-red-50 p-4 text-red-800">
 							<p className="font-semibold">Error</p>
 							<p className="text-sm">{error}</p>
 						</div>

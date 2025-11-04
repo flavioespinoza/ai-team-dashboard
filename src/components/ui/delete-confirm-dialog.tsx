@@ -51,7 +51,7 @@ export default function DeleteConfirmDialog({
 
 			<Dialog.Portal>
 				<Dialog.Overlay className="data-[state=open]:animate-fadeIn fixed inset-0 bg-black/40" />
-				<Dialog.Content className="data-[state=open]:animate-fadeIn fixed left-1/2 top-1/2 w-[90vw] max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-xl bg-white p-6 shadow-lg focus:outline-none">
+				<Dialog.Content className="data-[state=open]:animate-fadeIn fixed top-1/2 left-1/2 w-[90vw] max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-xl bg-white p-6 shadow-lg focus:outline-none">
 					<Dialog.Title className="mb-2 text-lg font-semibold text-gray-900">{title}</Dialog.Title>
 					<Dialog.Description className="mb-6 text-sm text-gray-600">
 						{description}
@@ -61,7 +61,7 @@ export default function DeleteConfirmDialog({
 						<Dialog.Close asChild>
 							<Button variant="outline">Cancel</Button>
 						</Dialog.Close>
-						<Button onClick={handleConfirm} variant='danger'>
+						<Button onClick={handleConfirm} variant="danger">
 							Delete
 						</Button>
 					</div>

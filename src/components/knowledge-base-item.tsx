@@ -11,7 +11,9 @@ import { useSetAtom } from 'jotai'
 import { Badge } from './ui/badge'
 import { Button } from './ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
-import DeleteConfirmDialog from './ui/delete-confirm-dialog' // ✅ import your dialog
+import DeleteConfirmDialog from './ui/delete-confirm-dialog'
+
+// ✅ import your dialog
 
 interface KnowledgeBaseItemProps {
 	item: KnowledgeBaseItem
@@ -44,9 +46,7 @@ export function KnowledgeBaseItemComponent({ item }: KnowledgeBaseItemProps) {
 			const result = await togglePinItem(item._id)
 			if (result.success && result.data) {
 				setKnowledgeBase((prev) =>
-					prev.map((i) =>
-						i._id === item._id ? { ...i, isPinned: result.data!.isPinned } : i
-					)
+					prev.map((i) => (i._id === item._id ? { ...i, isPinned: result.data!.isPinned } : i))
 				)
 			}
 		} catch (error) {
@@ -56,8 +56,7 @@ export function KnowledgeBaseItemComponent({ item }: KnowledgeBaseItemProps) {
 		}
 	}
 
-	const answerPreview =
-		item.answer.length > 150 ? `${item.answer.slice(0, 150)}...` : item.answer
+	const answerPreview = item.answer.length > 150 ? `${item.answer.slice(0, 150)}...` : item.answer
 
 	const createdAt = new Date(item.createdAt).toLocaleDateString('en-US', {
 		month: 'short',
@@ -117,33 +116,23 @@ export function KnowledgeBaseItemComponent({ item }: KnowledgeBaseItemProps) {
 							components={{
 								p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
 								code: ({ children }) => (
-									<code className="rounded bg-gray-200 px-1 py-0.5 text-sm dark:bg-gray-700">
-										{children}
-									</code>
+									<code className="rounded bg-gray-200 px-1 py-0.5 text-sm">{children}</code>
 								),
 								pre: ({ children }) => (
-									<pre className="my-2 overflow-x-auto rounded bg-gray-200 p-2 dark:bg-gray-700">
-										{children}
-									</pre>
+									<pre className="my-2 overflow-x-auto rounded bg-gray-200 p-2">{children}</pre>
 								)
 							}}
 						>
 							{item.answer}
 						</ReactMarkdown>
 					) : (
-						<p className="text-sm text-gray-600 dark:text-gray-400">
-							{answerPreview}
-						</p>
+						<p className="text-sm text-gray-600">{answerPreview}</p>
 					)}
 				</div>
 
 				<div className="flex items-center justify-between">
 					<span className="text-xs text-gray-500">{createdAt}</span>
-					<Button
-						size="sm"
-						variant="ghost"
-						onClick={() => setIsExpanded(!isExpanded)}
-					>
+					<Button size="sm" variant="ghost" onClick={() => setIsExpanded(!isExpanded)}>
 						{isExpanded ? 'Show less' : 'Show more'}
 					</Button>
 				</div>

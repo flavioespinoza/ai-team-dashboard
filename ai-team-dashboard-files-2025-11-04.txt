@@ -1,0 +1,1517 @@
+===== src/design/system.json =====
+{
+	"project": {
+		"name": "AI Team Dashboard",
+		"description": "A clean, modern internal dashboard integrating an AI assistant and a searchable knowledge base. Minimalist, professional design with Tailwind-inspired color palette."
+	},
+	"colors": {
+		"primary": "#4cb8ab",
+		"secondary": "#fe3557",
+		"tertiary": "#636e5b",
+		"background_light": "#f8fafc",
+		"background_dark": "#1f2937",
+		"card_light": "#ffffff",
+		"card_dark": "#111827",
+		"text_primary_light": "#111827",
+		"text_primary_dark": "#f9fafb",
+		"border": "#e5e7eb"
+	},
+	"layout": {
+		"header": {
+			"height": 72,
+			"background": "card_light",
+			"border_bottom": true,
+			"elements": [
+				{ "type": "logo", "position": "left" },
+				{ "type": "title", "text": "AI Team Dashboard", "variant": "h1" },
+				{ "type": "subtitle", "text": "Ask questions. Build knowledge." },
+				{ "type": "profile", "position": "right" },
+				{ "type": "theme_toggle", "position": "right" }
+			]
+		},
+		"body": {
+			"type": "split",
+			"columns": [
+				{
+					"width": "2/3",
+					"id": "chat_interface",
+					"components": [{ "type": "card", "title": "AI Assistant", "component_ref": "chat_card" }]
+				},
+				{
+					"width": "1/3",
+					"id": "knowledge_sidebar",
+					"components": [
+						{ "type": "card", "title": "Knowledge Base", "component_ref": "sidebar_card" }
+					]
+				}
+			]
+		},
+		"mobile": {
+			"stacked": true,
+			"order": ["chat_interface", "knowledge_sidebar"]
+		}
+	},
+	"components": {
+		"chat_card": {
+			"header": {
+				"title": "AI Assistant",
+				"action_button": {
+					"icon": "MessageSquarePlus",
+					"label": "New Chat",
+					"variant": "outline",
+					"size": "sm"
+				}
+			},
+			"body": {
+				"scrollable": true,
+				"message_bubbles": {
+					"user": { "background": "#4cb8ab", "color": "#ffffff", "align": "right" },
+					"assistant": { "background": "#f3f4f6", "color": "#111827", "align": "left" }
+				},
+				"loading_state": { "type": "dots", "color": "#636e5b" }
+			},
+			"footer": {
+				"input_area": {
+					"type": "textarea",
+					"placeholder": "Ask a question...",
+					"button": {
+						"text": "Ask",
+						"variant": "primary",
+						"hover": { "opacity": 0.9, "brightness": 1.05 }
+					}
+				}
+			}
+		},
+		"sidebar_card": {
+			"search": {
+				"placeholder": "Search knowledge base...",
+				"border_color": "#e5e7eb",
+				"focus_ring": "#4cb8ab"
+			},
+			"content": {
+				"scrollable": true,
+				"item_card": {
+					"background": "card_light",
+					"hover": { "brightness": 1.05 },
+					"elements": [
+						{ "type": "title", "font_size": 16 },
+						{ "type": "badge_group", "colors": ["#fe3557", "#636e5b"] },
+						{ "type": "markdown_preview" },
+						{ "type": "date_label", "color": "#6b7280" },
+						{ "type": "buttons", "icons": ["📌", "🗑️"], "hover_effects": true }
+					]
+				}
+			}
+		}
+	},
+	"typography": {
+		"font_family": "Geist, Inter, sans-serif",
+		"heading_weight": 600,
+		"body_weight": 400,
+		"line_height": 1.5,
+		"letter_spacing": 0.1
+	},
+	"effects": {
+		"border_radius": 12,
+		"shadow": "0 2px 6px rgba(0,0,0,0.08)",
+		"transition": "all 0.2s ease-in-out"
+	},
+	"interactions": {
+		"hover": {
+			"buttons": { "opacity": 0.9, "brightness": 1.05 },
+			"cards": { "shadow": "0 4px 12px rgba(0,0,0,0.12)" }
+		},
+		"active": { "buttons": { "brightness": 0.95 } },
+		"focus_visible": { "outline": true, "ring_color": "#4cb8ab" }
+	}
+}
+===== src/types/global.d.ts =====
+// Date: 2025-11-04
+// Version: 1.0.0
+
+declare global {
+	var mongoose: {
+		conn: typeof import('mongoose') | null
+		promise: Promise<typeof import('mongoose')> | null
+	}
+}
+
+export {}
+===== src/app/actions.ts =====
+// Date: 2025-11-04
+// Version: 1.1.0
+
+'use server'
+
+import { connectDB } from '@/db'
+import { IKnowledgeBase, KnowledgeBase } from '@/db/schema'
+import OpenAI from 'openai'
+import { z } from 'zod'
+
+const openai = new OpenAI({
+	apiKey: process.env.OPENAI_API_KEY
+})
+
+// Validation schemas
+const questionSchema = z.string().min(1, 'Question cannot be empty').max(2000)
+const tagsSchema = z.array(z.string()).optional()
+
+type ServerActionResponse<T = unknown> = {
+	success: boolean
+	data?: T
+	error?: string
+}
+
+/**
+ * Ask the AI assistant a question
+ */
+export async function askAssistant(question: string): Promise<ServerActionResponse<string>> {
+	try {
+		// Validate input
+		const validatedQuestion = questionSchema.parse(question)
+
+		// Call OpenAI API
+		const completion = await openai.chat.completions.create({
+			model: 'gpt-4o-mini',
+			messages: [
+				{
+					role: 'system',
+					content:
+						'You are a helpful AI assistant for an internal team. Provide clear, concise, and actionable answers.'
+				},
+				{
+					role: 'user',
+					content: validatedQuestion
+				}
+			],
+			temperature: 0.7,
+			max_tokens: 1000
+		})
+
+		const answer = completion.choices[0]?.message?.content || ''
+
+		if (!answer) {
+			throw new Error('No response from AI assistant')
+		}
+
+		return {
+			success: true,
+			data: answer
+		}
+	} catch (error) {
+		console.error('Error in askAssistant:', error)
+
+		if (error instanceof z.ZodError) {
+			return {
+				success: false,
+				error: error.issues[0]?.message || 'Invalid question format'
+			}
+		}
+
+		if (error instanceof Error) {
+			return {
+				success: false,
+				error: error.message
+			}
+		}
+
+		return {
+			success: false,
+			error: 'Failed to get response from AI assistant'
+		}
+	}
+}
+
+/**
+ * Save a Q&A pair to the knowledge base
+ */
+export async function saveToKnowledgeBase(
+	question: string,
+	answer: string,
+	tags?: string[]
+): Promise<ServerActionResponse<IKnowledgeBase>> {
+	try {
+		// Validate inputs
+		const validatedQuestion = questionSchema.parse(question)
+		const validatedAnswer = z.string().min(1).parse(answer)
+		const validatedTags = tagsSchema.parse(tags)
+
+		// Connect to database
+		await connectDB()
+
+		// Create new knowledge base entry
+		const entry = await KnowledgeBase.create({
+			question: validatedQuestion,
+			answer: validatedAnswer,
+			tags: validatedTags || [],
+			isPinned: false
+		})
+
+		// Convert to plain object
+		const plainEntry = entry.toObject() as IKnowledgeBase
+		plainEntry._id = entry._id.toString()
+
+		return {
+			success: true,
+			data: plainEntry
+		}
+	} catch (error) {
+		console.error('Error in saveToKnowledgeBase:', error)
+
+		if (error instanceof z.ZodError) {
+			return {
+				success: false,
+				error: error.issues[0]?.message || 'Invalid input format'
+			}
+		}
+
+		if (error instanceof Error) {
+			return {
+				success: false,
+				error: error.message
+			}
+		}
+
+		return {
+			success: false,
+			error: 'Failed to save to knowledge base'
+		}
+	}
+}
+
+/**
+ * Get all knowledge base entries
+ */
+export async function getKnowledgeBase(): Promise<ServerActionResponse<IKnowledgeBase[]>> {
+	try {
+		// Connect to database
+		await connectDB()
+
+		// Fetch all entries, sorted by most recent first
+		const entries = await KnowledgeBase.find().sort({ createdAt: -1 }).lean().exec()
+
+		// Convert ObjectId to string
+		const plainEntries = entries.map((entry) => ({
+			...entry,
+			_id: entry._id?.toString() || ''
+		})) as unknown as IKnowledgeBase[]
+
+		return {
+			success: true,
+			data: plainEntries
+		}
+	} catch (error) {
+		console.error('Error in getKnowledgeBase:', error)
+
+		if (error instanceof Error) {
+			return {
+				success: false,
+				error: error.message
+			}
+		}
+
+		return {
+			success: false,
+			error: 'Failed to fetch knowledge base'
+		}
+	}
+}
+
+/**
+ * Delete a knowledge base entry by ID
+ */
+export async function deleteKnowledgeBaseItem(id: string): Promise<ServerActionResponse<void>> {
+	try {
+		// Validate ID
+		const validatedId = z.string().min(1).parse(id)
+
+		// Connect to database
+		await connectDB()
+
+		// Delete the entry
+		const result = await KnowledgeBase.findByIdAndDelete(validatedId)
+
+		if (!result) {
+			throw new Error('Knowledge base item not found')
+		}
+
+		return {
+			success: true
+		}
+	} catch (error) {
+		console.error('Error in deleteKnowledgeBaseItem:', error)
+
+		if (error instanceof z.ZodError) {
+			return {
+				success: false,
+				error: 'Invalid ID format'
+			}
+		}
+
+		if (error instanceof Error) {
+			return {
+				success: false,
+				error: error.message
+			}
+		}
+
+		return {
+			success: false,
+			error: 'Failed to delete knowledge base item'
+		}
+	}
+}
+
+/**
+ * Toggle the pinned status of a knowledge base entry
+ */
+export async function togglePinItem(id: string): Promise<ServerActionResponse<IKnowledgeBase>> {
+	try {
+		// Validate ID
+		const validatedId = z.string().min(1).parse(id)
+
+		// Connect to database
+		await connectDB()
+
+		// Find the entry
+		const entry = await KnowledgeBase.findById(validatedId)
+
+		if (!entry) {
+			throw new Error('Knowledge base item not found')
+		}
+
+		// Toggle isPinned
+		entry.isPinned = !entry.isPinned
+		await entry.save()
+
+		// Convert to plain object
+		const plainEntry = entry.toObject() as IKnowledgeBase
+		plainEntry._id = entry._id.toString()
+
+		return {
+			success: true,
+			data: plainEntry
+		}
+	} catch (error) {
+		console.error('Error in togglePinItem:', error)
+
+		if (error instanceof z.ZodError) {
+			return {
+				success: false,
+				error: 'Invalid ID format'
+			}
+		}
+
+		if (error instanceof Error) {
+			return {
+				success: false,
+				error: error.message
+			}
+		}
+
+		return {
+			success: false,
+			error: 'Failed to toggle pin status'
+		}
+	}
+}===== src/app/layout.tsx =====
+import type { Metadata } from 'next'
+import { Geist, Geist_Mono } from 'next/font/google'
+import { Providers } from '@/components/providers'
+import './globals.css'
+
+const geistSans = Geist({
+	variable: '--font-geist-sans',
+	subsets: ['latin']
+})
+
+const geistMono = Geist_Mono({
+	variable: '--font-geist-mono',
+	subsets: ['latin']
+})
+
+export const metadata: Metadata = {
+	title: 'AI Team Dashboard',
+	description: 'Internal Team Dashboard with AI Assistant'
+}
+
+export default function RootLayout({
+	children
+}: Readonly<{
+	children: React.ReactNode
+}>) {
+	return (
+		<html lang="en">
+			<body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+				<Providers>{children}</Providers>
+			</body>
+		</html>
+	)
+}
+===== src/app/page.tsx =====
+// Date: 2025-11-04
+// Version: 1.0.0
+
+'use client'
+
+import { useEffect, useState } from 'react'
+import { getKnowledgeBase } from '@/app/actions'
+import { ChatInterface } from '@/components/chat-interface'
+import { KnowledgeBaseSidebar } from '@/components/knowledge-base-sidebar'
+import { knowledgeBaseState } from '@/state/atoms'
+import { useSetAtom } from 'jotai'
+
+export default function Home() {
+	const setKnowledgeBase = useSetAtom(knowledgeBaseState)
+	const [isLoading, setIsLoading] = useState(true)
+	const [error, setError] = useState<string | null>(null)
+
+	// Load knowledge base on mount
+	useEffect(() => {
+		async function loadKnowledgeBase() {
+			try {
+				const result = await getKnowledgeBase()
+
+				if (result.success && result.data) {
+					setKnowledgeBase(result.data)
+				} else {
+					setError(result.error || 'Failed to load knowledge base')
+				}
+			} catch (err) {
+				console.error('Error loading knowledge base:', err)
+				setError('Failed to load knowledge base')
+			} finally {
+				setIsLoading(false)
+			}
+		}
+
+		loadKnowledgeBase()
+	}, [setKnowledgeBase])
+
+	return (
+		<div className="flex min-h-screen flex-col bg-gray-50 bg-[var(--background)]">
+			{/* Header */}
+			<header className="border-b border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-950">
+				<div className="container mx-auto px-4 py-4">
+					<h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">AI Team Dashboard</h1>
+					<p className="text-sm text-gray-600 dark:text-gray-400">
+						Ask questions and build your knowledge base
+					</p>
+				</div>
+			</header>
+
+			{/* Main content */}
+			<main className="container mx-auto flex flex-1 gap-4 overflow-hidden p-4">
+				{isLoading ? (
+					<div className="flex flex-1 items-center justify-center">
+						<div className="text-center">
+							<div className="mb-4 h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-blue-600"></div>
+							<p className="text-gray-600 dark:text-gray-400">Loading...</p>
+						</div>
+					</div>
+				) : error ? (
+					<div className="flex flex-1 items-center justify-center">
+						<div className="rounded-lg bg-red-50 p-4 text-red-800 dark:bg-red-900/20 dark:text-red-200">
+							<p className="font-semibold">Error</p>
+							<p className="text-sm">{error}</p>
+						</div>
+					</div>
+				) : (
+					<>
+						{/* Chat Interface - Main area */}
+						<div className="flex flex-1 flex-col overflow-hidden lg:w-2/3">
+							<ChatInterface />
+						</div>
+
+						{/* Knowledge Base Sidebar */}
+						<div className="hidden w-full overflow-hidden lg:block lg:w-1/3">
+							<KnowledgeBaseSidebar />
+						</div>
+					</>
+				)}
+			</main>
+
+			{/* Mobile Knowledge Base - Shows as separate section on mobile */}
+			<div className="container mx-auto block px-4 pb-4 lg:hidden">
+				<KnowledgeBaseSidebar />
+			</div>
+		</div>
+	)
+}
+===== src/state/atoms.ts =====
+// Date: 2025-11-04
+// Version: 1.0.0
+import { atom } from 'jotai'
+
+export type Message = {
+	id: string
+	type: 'user' | 'assistant'
+	content: string
+	timestamp: Date
+}
+
+export type KnowledgeBaseItem = {
+	_id: string
+	question: string
+	answer: string
+	tags?: string[]
+	isPinned: boolean
+	createdAt: Date
+	updatedAt: Date
+}
+
+export const messagesState = atom<Message[]>([])
+
+export const knowledgeBaseState = atom<KnowledgeBaseItem[]>([])
+
+export const isLoadingState = atom<boolean>(false)
+
+export const selectedKnowledgeItemState = atom<KnowledgeBaseItem | null>(null)
+===== src/state/selectors.ts =====
+// Date: 2025-11-04
+// Version: 1.0.0
+import { atom } from 'jotai'
+import { knowledgeBaseState } from './atoms'
+
+// Filter pinned items
+export const pinnedItemsSelector = atom((get) => {
+	const items = get(knowledgeBaseState)
+	return items.filter((item) => item.isPinned)
+})
+
+// Sort by date (most recent first)
+export const sortedKnowledgeBaseSelector = atom((get) => {
+	const items = get(knowledgeBaseState)
+	return [...items].sort(
+		(a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+	)
+})
+
+// Sort with pinned items first, then by date
+export const sortedWithPinnedFirstSelector = atom((get) => {
+	const items = get(knowledgeBaseState)
+	return [...items].sort((a, b) => {
+		// Pinned items come first
+		if (a.isPinned && !b.isPinned) return -1
+		if (!a.isPinned && b.isPinned) return 1
+		// Within same pin status, sort by date
+		return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+	})
+})
+===== src/components/ui/card.tsx =====
+// Date: 2025-11-04
+// Version: 1.0.0
+import { HTMLAttributes, forwardRef } from 'react'
+import { cn } from '@/lib/utils'
+
+const Card = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
+	({ className, ...props }, ref) => (
+		<div
+			ref={ref}
+			className={cn(
+				'rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-950',
+				className
+			)}
+			{...props}
+		/>
+	)
+)
+Card.displayName = 'Card'
+
+const CardHeader = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
+	({ className, ...props }, ref) => (
+		<div ref={ref} className={cn('flex flex-col space-y-1.5 p-6', className)} {...props} />
+	)
+)
+CardHeader.displayName = 'CardHeader'
+
+const CardTitle = forwardRef<HTMLParagraphElement, HTMLAttributes<HTMLHeadingElement>>(
+	({ className, ...props }, ref) => (
+		<h3
+			ref={ref}
+			className={cn('text-lg leading-none font-semibold tracking-tight', className)}
+			{...props}
+		/>
+	)
+)
+CardTitle.displayName = 'CardTitle'
+
+const CardDescription = forwardRef<HTMLParagraphElement, HTMLAttributes<HTMLParagraphElement>>(
+	({ className, ...props }, ref) => (
+		<p ref={ref} className={cn('text-sm text-gray-500 dark:text-gray-400', className)} {...props} />
+	)
+)
+CardDescription.displayName = 'CardDescription'
+
+const CardContent = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
+	({ className, ...props }, ref) => (
+		<div ref={ref} className={cn('p-6 pt-0', className)} {...props} />
+	)
+)
+CardContent.displayName = 'CardContent'
+
+const CardFooter = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
+	({ className, ...props }, ref) => (
+		<div ref={ref} className={cn('flex items-center p-6 pt-0', className)} {...props} />
+	)
+)
+CardFooter.displayName = 'CardFooter'
+
+export { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
+===== src/components/ui/delete-confirm-dialog.tsx =====
+'use client'
+
+import { useState } from 'react'
+import * as Dialog from '@radix-ui/react-dialog'
+import { Button } from './button'
+
+interface DeleteConfirmDialogProps {
+	onConfirm: () => void
+	triggerLabel?: string
+	title?: string
+	description?: string
+	/** Optional custom trigger (icon/button). If provided, it's rendered asChild. */
+	trigger?: React.ReactNode
+}
+
+/**
+ * A dialog component that prompts the user for confirmation before performing a delete action.
+ * It provides a customizable trigger, title, and description.
+ *
+ * @param {DeleteConfirmDialogProps} props - The props for the component.
+ * @param {() => void} props.onConfirm - The function to call when the user confirms the action.
+ * @param {string} [props.triggerLabel='Delete'] - The text to display on the default trigger button.
+ * @param {string} [props.title='Delete Report?'] - The title of the dialog.
+ * @param {string} [props.description='Are you sure you want to delete this report? This action cannot be undone.'] - The description text within the dialog.
+ * @param {React.ReactNode} [props.trigger] - An optional custom trigger element (e.g., an icon button).
+ * @returns {JSX.Element} The rendered dialog component.
+ */
+export default function DeleteConfirmDialog({
+	onConfirm,
+	triggerLabel = 'Delete',
+	title = 'Delete Report?',
+	description = 'Are you sure you want to delete this report? This action cannot be undone.',
+	trigger
+}: DeleteConfirmDialogProps) {
+	const [open, setOpen] = useState(false)
+
+	const handleConfirm = () => {
+		onConfirm()
+		setOpen(false)
+	}
+
+	return (
+		<Dialog.Root open={open} onOpenChange={setOpen}>
+			{trigger ? (
+				<Dialog.Trigger asChild>{trigger}</Dialog.Trigger>
+			) : (
+				<Dialog.Trigger asChild>
+					<button className="btn-primary">{triggerLabel}</button>
+				</Dialog.Trigger>
+			)}
+
+			<Dialog.Portal>
+				<Dialog.Overlay className="data-[state=open]:animate-fadeIn fixed inset-0 bg-black/40" />
+				<Dialog.Content className="data-[state=open]:animate-fadeIn fixed left-1/2 top-1/2 w-[90vw] max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-xl bg-white p-6 shadow-lg focus:outline-none">
+					<Dialog.Title className="mb-2 text-lg font-semibold text-gray-900">{title}</Dialog.Title>
+					<Dialog.Description className="mb-6 text-sm text-gray-600">
+						{description}
+					</Dialog.Description>
+
+					<div className="flex justify-end gap-3">
+						<Dialog.Close asChild>
+							<Button variant="outline">Cancel</Button>
+						</Dialog.Close>
+						<Button onClick={handleConfirm} variant='danger'>
+							Delete
+						</Button>
+					</div>
+				</Dialog.Content>
+			</Dialog.Portal>
+		</Dialog.Root>
+	)
+}
+===== src/components/ui/scroll-area.tsx =====
+// Date: 2025-11-04
+// Version: 1.0.0
+import { HTMLAttributes, forwardRef } from 'react'
+import { cn } from '@/lib/utils'
+
+export interface ScrollAreaProps extends HTMLAttributes<HTMLDivElement> {}
+
+const ScrollArea = forwardRef<HTMLDivElement, ScrollAreaProps>(
+	({ className, children, ...props }, ref) => {
+		return (
+			<div ref={ref} className={cn('relative overflow-auto', className)} {...props}>
+				<div className="h-full w-full">{children}</div>
+			</div>
+		)
+	}
+)
+
+ScrollArea.displayName = 'ScrollArea'
+
+export { ScrollArea }
+===== src/components/ui/badge.tsx =====
+// Date: 2025-11-04
+// Version: 1.0.0
+import { HTMLAttributes } from 'react'
+import { cn } from '@/lib/utils'
+
+export interface BadgeProps extends HTMLAttributes<HTMLDivElement> {
+	variant?: 'default' | 'secondary' | 'success' | 'warning' | 'destructive'
+}
+
+function Badge({ className, variant = 'default', ...props }: BadgeProps) {
+	return (
+		<div
+			className={cn(
+				'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors',
+				{
+					'bg-blue-100 text-blue-900 dark:bg-blue-900 dark:text-blue-100': variant === 'default',
+					'bg-gray-100 text-gray-900 bg-[var(--surface)] dark:text-gray-100': variant === 'secondary',
+					'bg-green-100 text-green-900 dark:bg-green-900 dark:text-green-100':
+						variant === 'success',
+					'bg-yellow-100 text-yellow-900 dark:bg-yellow-900 dark:text-yellow-100':
+						variant === 'warning',
+					'bg-red-100 text-red-900 dark:bg-red-900 dark:text-red-100': variant === 'destructive'
+				},
+				className
+			)}
+			{...props}
+		/>
+	)
+}
+
+export { Badge }
+===== src/components/ui/button.tsx =====
+// Date: 2025-11-04
+// Version: 2.3.0 — Tailwind v4 tokens aligned (primary=cblue, secondary=hotpink, tertiary=sage)
+
+import { ButtonHTMLAttributes, forwardRef } from 'react'
+import { cn } from '@/lib/utils'
+
+export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: 'primary' | 'secondary' | 'tertiary' | 'danger' | 'outline' | 'ghost'
+  size?: 'sm' | 'md' | 'lg'
+}
+
+const Button = forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, variant = 'primary', size = 'md', ...props }, ref) => {
+    return (
+      <button
+        ref={ref}
+        {...props}
+        className={cn(
+          // Base
+          'inline-flex items-center justify-center font-medium rounded-md transition-all duration-200 ease-in-out',
+          'focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none',
+          'disabled:pointer-events-none disabled:opacity-50',
+          'cursor-pointer select-none',
+
+          // Variants mapped to @theme inline tokens
+          {
+            // PRIMARY -> cblue (#4c8bab)
+            'bg-primary-500 text-white hover:bg-primary-600 focus-visible:ring-primary-500':
+              variant === 'primary',
+
+            // SECONDARY -> hotpink (#fe3557)
+            'bg-secondary-500 text-white hover:bg-secondary-600 focus-visible:ring-secondary-500':
+              variant === 'secondary',
+
+            // TERTIARY -> sage (#636e5b)
+            'bg-tertiary-500 text-white hover:bg-tertiary-600 focus-visible:ring-tertiary-500':
+              variant === 'tertiary',
+
+            // DANGER -> same hotpink scale (separate token for semantics)
+            'bg-danger-500 text-white hover:bg-danger-600 focus-visible:ring-danger-500':
+              variant === 'danger',
+
+            // OUTLINE -> neutral outline
+            'border border-gray-300 bg-transparent text-black hover:bg-gray-100 dark:border-gray-700 dark:text-black dark:hover:bg-gray-300':
+              variant === 'outline',
+
+            // GHOST -> minimal
+            'bg-transparent text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800':
+              variant === 'ghost'
+          },
+
+          // Sizes
+          {
+            'h-8 px-3 text-sm': size === 'sm',
+            'h-10 px-4 text-base': size === 'md',
+            'h-12 px-6 text-lg': size === 'lg'
+          },
+
+          className
+        )}
+      />
+    )
+  }
+)
+
+Button.displayName = 'Button'
+
+export { Button }
+===== src/components/ui/input.tsx =====
+// Date: 2025-11-04
+// Version: 1.0.0
+import { InputHTMLAttributes, TextareaHTMLAttributes, forwardRef } from 'react'
+import { cn } from '@/lib/utils'
+
+export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {}
+
+const Input = forwardRef<HTMLInputElement, InputProps>(({ className, type, ...props }, ref) => {
+	return (
+		<input
+			type={type}
+			className={cn(
+				'flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm',
+				'focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 focus-visible:outline-none',
+				'disabled:cursor-not-allowed disabled:opacity-50',
+				'dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100',
+				className
+			)}
+			ref={ref}
+			{...props}
+		/>
+	)
+})
+
+Input.displayName = 'Input'
+
+export interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {}
+
+const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(({ className, ...props }, ref) => {
+	return (
+		<textarea
+			className={cn(
+				'flex min-h-[80px] w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm',
+				'focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 focus-visible:outline-none',
+				'disabled:cursor-not-allowed disabled:opacity-50',
+				'dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100',
+				className
+			)}
+			ref={ref}
+			{...props}
+		/>
+	)
+})
+
+Textarea.displayName = 'Textarea'
+
+export { Input, Textarea }
+===== src/components/knowledge-base-item.tsx =====
+// Date: 2025-11-04
+// Version: 1.1.0 — switched to DeleteConfirmDialog
+
+'use client'
+
+import { useState } from 'react'
+import ReactMarkdown from 'react-markdown'
+import { deleteKnowledgeBaseItem, togglePinItem } from '@/app/actions'
+import { type KnowledgeBaseItem, knowledgeBaseState } from '@/state/atoms'
+import { useSetAtom } from 'jotai'
+import { Badge } from './ui/badge'
+import { Button } from './ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
+import DeleteConfirmDialog from './ui/delete-confirm-dialog' // ✅ import your dialog
+
+interface KnowledgeBaseItemProps {
+	item: KnowledgeBaseItem
+}
+
+export function KnowledgeBaseItemComponent({ item }: KnowledgeBaseItemProps) {
+	const [isExpanded, setIsExpanded] = useState(false)
+	const [isDeleting, setIsDeleting] = useState(false)
+	const [isTogglingPin, setIsTogglingPin] = useState(false)
+	const setKnowledgeBase = useSetAtom(knowledgeBaseState)
+
+	// ✅ Wrapped delete logic (no built-in confirm)
+	const handleDelete = async () => {
+		setIsDeleting(true)
+		try {
+			const result = await deleteKnowledgeBaseItem(item._id)
+			if (result.success) {
+				setKnowledgeBase((prev) => prev.filter((i) => i._id !== item._id))
+			}
+		} catch (error) {
+			console.error('Error deleting item:', error)
+		} finally {
+			setIsDeleting(false)
+		}
+	}
+
+	const handleTogglePin = async () => {
+		setIsTogglingPin(true)
+		try {
+			const result = await togglePinItem(item._id)
+			if (result.success && result.data) {
+				setKnowledgeBase((prev) =>
+					prev.map((i) =>
+						i._id === item._id ? { ...i, isPinned: result.data!.isPinned } : i
+					)
+				)
+			}
+		} catch (error) {
+			console.error('Error toggling pin:', error)
+		} finally {
+			setIsTogglingPin(false)
+		}
+	}
+
+	const answerPreview =
+		item.answer.length > 150 ? `${item.answer.slice(0, 150)}...` : item.answer
+
+	const createdAt = new Date(item.createdAt).toLocaleDateString('en-US', {
+		month: 'short',
+		day: 'numeric',
+		year: 'numeric'
+	})
+
+	return (
+		<Card className="transition-shadow hover:shadow-md">
+			<CardHeader className="pb-3">
+				<div className="flex items-start justify-between gap-2">
+					<CardTitle className="line-clamp-2 text-base">{item.question}</CardTitle>
+					<div className="flex gap-1">
+						<Button
+							size="sm"
+							variant="ghost"
+							onClick={handleTogglePin}
+							disabled={isTogglingPin}
+							className="h-8 w-8 p-0"
+						>
+							{item.isPinned ? '📌' : '📍'}
+						</Button>
+
+						{/* ✅ DeleteConfirmDialog replaces confirm() */}
+						<DeleteConfirmDialog
+							onConfirm={handleDelete}
+							title="Delete Knowledge Base Item?"
+							description={`Are you sure you want to delete “${item.question}”? This action cannot be undone.`}
+							trigger={
+								<Button
+									size="sm"
+									variant="ghost"
+									disabled={isDeleting}
+									className="h-8 w-8 p-0 text-red-600 hover:bg-red-50 hover:text-red-700"
+								>
+									🗑️
+								</Button>
+							}
+						/>
+					</div>
+				</div>
+
+				<div className="flex flex-wrap gap-2">
+					{item.isPinned && <Badge variant="warning">Pinned</Badge>}
+					{item.tags?.map((tag) => (
+						<Badge key={tag} variant="secondary">
+							{tag}
+						</Badge>
+					))}
+				</div>
+			</CardHeader>
+
+			<CardContent>
+				<div className="mb-2">
+					{isExpanded ? (
+						<ReactMarkdown
+							components={{
+								p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+								code: ({ children }) => (
+									<code className="rounded bg-gray-200 px-1 py-0.5 text-sm dark:bg-gray-700">
+										{children}
+									</code>
+								),
+								pre: ({ children }) => (
+									<pre className="my-2 overflow-x-auto rounded bg-gray-200 p-2 dark:bg-gray-700">
+										{children}
+									</pre>
+								)
+							}}
+						>
+							{item.answer}
+						</ReactMarkdown>
+					) : (
+						<p className="text-sm text-gray-600 dark:text-gray-400">
+							{answerPreview}
+						</p>
+					)}
+				</div>
+
+				<div className="flex items-center justify-between">
+					<span className="text-xs text-gray-500">{createdAt}</span>
+					<Button
+						size="sm"
+						variant="ghost"
+						onClick={() => setIsExpanded(!isExpanded)}
+					>
+						{isExpanded ? 'Show less' : 'Show more'}
+					</Button>
+				</div>
+			</CardContent>
+		</Card>
+	)
+}
+===== src/components/knowledge-base-sidebar.tsx =====
+// Date: 2025-11-04
+// Version: 1.0.0
+
+'use client'
+
+import { useState } from 'react'
+import { sortedWithPinnedFirstSelector } from '@/state/selectors'
+import { useAtomValue } from 'jotai'
+import { KnowledgeBaseItemComponent } from './knowledge-base-item'
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
+import { Input } from './ui/input'
+import { ScrollArea } from './ui/scroll-area'
+
+export function KnowledgeBaseSidebar() {
+	const knowledgeBaseItems = useAtomValue(sortedWithPinnedFirstSelector)
+	const [searchQuery, setSearchQuery] = useState('')
+
+	// Filter items based on search query
+	const filteredItems = knowledgeBaseItems.filter((item) => {
+		const query = searchQuery.toLowerCase()
+		return (
+			item.question.toLowerCase().includes(query) ||
+			item.answer.toLowerCase().includes(query) ||
+			item.tags?.some((tag) => tag.toLowerCase().includes(query))
+		)
+	})
+
+	return (
+		<Card className="flex h-full flex-col">
+			<CardHeader>
+				<CardTitle>Knowledge Base</CardTitle>
+				<Input
+					type="text"
+					placeholder="Search knowledge base..."
+					value={searchQuery}
+					onChange={(e) => setSearchQuery(e.target.value)}
+					className="mt-2"
+				/>
+			</CardHeader>
+			<CardContent className="flex flex-1 flex-col overflow-hidden">
+				<ScrollArea className="flex-1 pr-4">
+					<div className="flex flex-col gap-4">
+						{filteredItems.length === 0 ? (
+							<div className="flex h-full items-center justify-center text-center text-gray-500">
+								<p>
+									{searchQuery
+										? 'No items found matching your search'
+										: 'No saved items yet. Save answers from the chat to build your knowledge base.'}
+								</p>
+							</div>
+						) : (
+							filteredItems.map((item) => <KnowledgeBaseItemComponent key={item._id} item={item} />)
+						)}
+					</div>
+				</ScrollArea>
+			</CardContent>
+		</Card>
+	)
+}
+===== src/components/chat-interface.tsx =====
+// Date: 2025-11-04
+// Version: 1.2.0
+
+'use client'
+
+import { FormEvent, useEffect, useRef, useState } from 'react'
+import { MessageSquarePlus } from 'lucide-react'
+import { useAtom } from 'jotai'
+import { askAssistant } from '@/app/actions'
+import { MessageComponent } from '@/components/message'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { Textarea } from '@/components/ui/input'
+import { messagesState } from '@/state/atoms'
+
+export function ChatInterface() {
+	const [messages, setMessages] = useAtom(messagesState)
+	const [question, setQuestion] = useState('')
+	const [isSubmitting, setIsSubmitting] = useState(false)
+	const [error, setError] = useState<string | null>(null)
+	const scrollRef = useRef<HTMLDivElement>(null)
+	const textareaRef = useRef<HTMLTextAreaElement>(null)
+
+	// Auto-scroll to bottom when new messages arrive
+	useEffect(() => {
+		if (scrollRef.current) {
+			const scrollElement = scrollRef.current.querySelector('[data-radix-scroll-area-viewport]')
+			if (scrollElement) {
+				scrollElement.scrollTop = scrollElement.scrollHeight
+			}
+		}
+	}, [messages])
+
+	const handleSubmit = async (e: FormEvent) => {
+		e.preventDefault()
+
+		if (!question.trim() || isSubmitting) {
+			return
+		}
+
+		setError(null)
+		setIsSubmitting(true)
+
+		// Add user message
+		const userMessage = {
+			id: Date.now().toString(),
+			type: 'user' as const,
+			content: question.trim(),
+			timestamp: new Date()
+		}
+
+		setMessages((prev) => [...prev, userMessage])
+		setQuestion('')
+
+		try {
+			// Call AI assistant
+			const result = await askAssistant(userMessage.content)
+
+			if (result.success && result.data) {
+				// Add assistant message
+				const assistantMessage = {
+					id: (Date.now() + 1).toString(),
+					type: 'assistant' as const,
+					content: result.data,
+					timestamp: new Date()
+				}
+
+				setMessages((prev) => [...prev, assistantMessage])
+			} else {
+				setError(result.error || 'Failed to get response from AI assistant')
+			}
+		} catch (err) {
+			setError('An unexpected error occurred')
+			console.error('Error asking assistant:', err)
+		} finally {
+			setIsSubmitting(false)
+			// Focus back on textarea
+			textareaRef.current?.focus()
+		}
+	}
+
+	const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+		if (e.key === 'Enter' && !e.shiftKey) {
+			e.preventDefault()
+			handleSubmit(e)
+		}
+	}
+
+	const handleNewChat = () => {
+		setMessages([])
+		setQuestion('')
+		setError(null)
+		textareaRef.current?.focus()
+	}
+
+	return (
+		<Card className="flex h-full flex-col">
+			<CardHeader>
+				<div className="flex items-center justify-between">
+					<CardTitle>AI Assistant</CardTitle>
+					<Button
+						variant="secondary"
+						size="sm"
+						onClick={handleNewChat}
+						disabled={messages.length === 0}
+						className="gap-2"
+					>
+						<MessageSquarePlus className="h-4 w-4" />
+						New Chat
+					</Button>
+				</div>
+			</CardHeader>
+			<CardContent className="flex flex-1 flex-col gap-4 overflow-hidden">
+				{/* Messages area */}
+				<ScrollArea ref={scrollRef} className="flex-1 pr-4">
+					<div className="flex flex-col gap-4">
+						{messages.length === 0 ? (
+							<div className="flex h-full items-center justify-center text-gray-500">
+								<p>Ask a question to get started</p>
+							</div>
+						) : (
+							messages.map((message, index) => (
+								<MessageComponent
+									key={message.id}
+									message={message}
+									previousMessage={index > 0 ? messages[index - 1] : undefined}
+								/>
+							))
+						)}
+						{isSubmitting && (
+							<div className="flex justify-start">
+								<div className="max-w-[80%] rounded-lg bg-gray-100 p-4 text-gray-900 bg-[var(--surface)] dark:text-gray-100">
+									<div className="flex items-center gap-2">
+										<div className="h-2 w-2 animate-pulse rounded-full bg-gray-600"></div>
+										<div className="animation-delay-200 h-2 w-2 animate-pulse rounded-full bg-gray-600"></div>
+										<div className="animation-delay-400 h-2 w-2 animate-pulse rounded-full bg-gray-600"></div>
+										<span className="ml-2 text-sm">Thinking...</span>
+									</div>
+								</div>
+							</div>
+						)}
+					</div>
+				</ScrollArea>
+
+				{/* Error message */}
+				{error && (
+					<div className="rounded-md bg-red-50 p-3 text-sm text-red-800 dark:bg-red-900/20 dark:text-red-200">
+						{error}
+					</div>
+				)}
+
+				{/* Input area */}
+				<form onSubmit={handleSubmit} className="flex gap-2">
+					<Textarea
+						ref={textareaRef}
+						value={question}
+						onChange={(e) => setQuestion(e.target.value)}
+						onKeyDown={handleKeyDown}
+						placeholder="Ask a question... (Press Enter to send, Shift+Enter for new line)"
+						className="min-h-[80px] resize-none"
+						disabled={isSubmitting}
+					/>
+					<Button variant="primary" type="submit" disabled={!question.trim() || isSubmitting} className="self-end">
+						{isSubmitting ? 'Sending...' : 'Ask'}
+					</Button>
+				</form>
+			</CardContent>
+		</Card>
+	)
+}
+===== src/components/message.tsx =====
+// Date: 2025-11-04
+// Version: 1.2.0
+
+'use client'
+
+import { useState } from 'react'
+import { useSetAtom } from 'jotai'
+import ReactMarkdown from 'react-markdown'
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism'
+import { saveToKnowledgeBase } from '@/app/actions'
+import { type Message, knowledgeBaseState } from '@/state/atoms'
+import { Button } from './ui/button'
+
+interface MessageProps {
+	message: Message
+	previousMessage?: Message
+}
+
+export function MessageComponent({ message, previousMessage }: MessageProps) {
+	const [isSaving, setIsSaving] = useState(false)
+	const [saved, setSaved] = useState(false)
+	const setKnowledgeBase = useSetAtom(knowledgeBaseState)
+
+	const handleSave = async () => {
+		if (!previousMessage || previousMessage.type !== 'user') {
+			return
+		}
+
+		setIsSaving(true)
+		try {
+			const result = await saveToKnowledgeBase(previousMessage.content, message.content)
+
+			if (result.success && result.data) {
+				setKnowledgeBase((prev) => [result.data!, ...prev])
+				setSaved(true)
+			}
+		} catch (error) {
+			console.error('Error saving to knowledge base:', error)
+		} finally {
+			setIsSaving(false)
+		}
+	}
+
+	const timestamp = new Date(message.timestamp).toLocaleTimeString('en-US', {
+		hour: 'numeric',
+		minute: '2-digit'
+	})
+
+	const isUser = message.type === 'user'
+
+	return (
+		<div className={`flex gap-3 ${isUser ? 'justify-end' : 'justify-start'}`}>
+			<div
+				className={`max-w-[80%] rounded-lg p-4 ${
+					isUser
+						? 'bg-blue-600 text-white'
+						: 'bg-gray-100 text-gray-900 bg-[var(--surface)] dark:text-gray-100'
+				}`}
+			>
+				<div className="mb-2">
+					<ReactMarkdown
+						components={{
+							p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+							code: ({ className, children, ...props }: any) => {
+								const match = /language-(\w+)/.exec(className || '')
+								const language = match ? match[1] : null
+								const inline = !language
+
+								if (!inline && language) {
+									return (
+										<SyntaxHighlighter
+											style={vscDarkPlus}
+											language={language}
+											PreTag="div"
+											customStyle={{
+												margin: '0.5rem 0',
+												borderRadius: '0.375rem',
+												fontSize: '0.875rem'
+											}}
+											{...props}
+										>
+											{String(children).replace(/\n$/, '')}
+										</SyntaxHighlighter>
+									)
+								}
+
+								return (
+									<code
+										className={`rounded px-1 py-0.5 text-sm ${
+											isUser ? 'bg-blue-700' : 'bg-gray-200 dark:bg-gray-700'
+										}`}
+										{...props}
+									>
+										{children}
+									</code>
+								)
+							}
+						}}
+					>
+						{message.content}
+					</ReactMarkdown>
+				</div>
+				<div className="flex items-center justify-between gap-2">
+					<span className="text-xs opacity-70">{timestamp}</span>
+					{!isUser && previousMessage && (
+						<Button
+							size="sm"
+							variant="ghost"
+							onClick={handleSave}
+							disabled={isSaving || saved}
+							className="text-xs"
+						>
+							{saved ? 'Saved' : isSaving ? 'Saving...' : 'Save to Knowledge Base'}
+						</Button>
+					)}
+				</div>
+			</div>
+		</div>
+	)
+}===== src/components/providers.tsx =====
+// Date: 2025-11-04
+// Version: 1.0.0
+
+'use client'
+
+import { Provider } from 'jotai'
+
+export function Providers({ children }: { children: React.ReactNode }) {
+	return <Provider>{children}</Provider>
+}
+===== src/lib/utils.ts =====
+// Date: 2025-11-04
+// Version: 1.0.0
+import { type ClassValue, clsx } from 'clsx'
+import { twMerge } from 'tailwind-merge'
+
+export function cn(...inputs: ClassValue[]) {
+	return twMerge(clsx(inputs))
+}
+===== src/db/schema.ts =====
+// Date: 2025-11-04
+// Version: 1.0.0
+import mongoose from 'mongoose'
+
+const KnowledgeBaseSchema = new mongoose.Schema(
+	{
+		question: {
+			type: String,
+			required: true,
+			trim: true
+		},
+		answer: {
+			type: String,
+			required: true
+		},
+		tags: {
+			type: [String],
+			default: []
+		},
+		isPinned: {
+			type: Boolean,
+			default: false
+		}
+	},
+	{
+		timestamps: true
+	}
+)
+
+export const KnowledgeBase =
+	mongoose.models.KnowledgeBase || mongoose.model('KnowledgeBase', KnowledgeBaseSchema)
+
+export type IKnowledgeBase = {
+	_id: string
+	question: string
+	answer: string
+	tags?: string[]
+	isPinned: boolean
+	createdAt: Date
+	updatedAt: Date
+}
+===== src/db/index.ts =====
+// Date: 2025-11-04
+// Version: 1.0.0
+import mongoose from 'mongoose'
+
+const MONGODB_URI = process.env.MONGODB_URI!
+const MONGODB_DB = process.env.MONGODB_DB!
+
+if (!MONGODB_URI) {
+	throw new Error('Please define MONGODB_URI environment variable')
+}
+
+if (!MONGODB_DB) {
+	throw new Error('Please define MONGODB_DB environment variable')
+}
+
+let cached = global.mongoose
+
+if (!cached) {
+	cached = global.mongoose = { conn: null, promise: null }
+}
+
+export async function connectDB() {
+	if (cached.conn) {
+		return cached.conn
+	}
+
+	if (!cached.promise) {
+		cached.promise = mongoose
+			.connect(MONGODB_URI, {
+				dbName: MONGODB_DB,
+				bufferCommands: false
+			})
+			.then((mongoose) => mongoose)
+	}
+
+	try {
+		cached.conn = await cached.promise
+	} catch (e) {
+		cached.promise = null
+		throw e
+	}
+
+	return cached.conn
+}

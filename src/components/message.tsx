@@ -4,12 +4,12 @@
 'use client'
 
 import { useState } from 'react'
-import { useSetAtom } from 'jotai'
 import ReactMarkdown from 'react-markdown'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism'
 import { saveToKnowledgeBase } from '@/app/actions'
 import { type Message, knowledgeBaseState } from '@/state/atoms'
+import { useSetAtom } from 'jotai'
 import { Button } from './ui/button'
 
 interface MessageProps {
@@ -53,9 +53,7 @@ export function MessageComponent({ message, previousMessage }: MessageProps) {
 		<div className={`flex gap-3 ${isUser ? 'justify-end' : 'justify-start'}`}>
 			<div
 				className={`max-w-[80%] rounded-lg p-4 ${
-					isUser
-						? 'bg-blue-600 text-white'
-						: 'bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-100'
+					isUser ? 'bg-blue-600 text-white' : 'bg-[var(--surface)] bg-gray-100 text-gray-900'
 				}`}
 			>
 				<div className="mb-2">
@@ -88,7 +86,7 @@ export function MessageComponent({ message, previousMessage }: MessageProps) {
 								return (
 									<code
 										className={`rounded px-1 py-0.5 text-sm ${
-											isUser ? 'bg-blue-700' : 'bg-gray-200 dark:bg-gray-700'
+											isUser ? 'bg-blue-700' : 'bg-gray-200'
 										}`}
 										{...props}
 									>
