@@ -83,7 +83,7 @@ body {
 
 /* === Layout containers === */
 .card {
-	@apply rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-sm;
+	@apply rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-lg/20;
 }
 
 .card-header {

@@ -8,11 +8,8 @@
 		"secondary": "#fe3557",
 		"tertiary": "#636e5b",
 		"background_light": "#f8fafc",
-		"background_dark": "#1f2937",
 		"card_light": "#ffffff",
-		"card_dark": "#111827",
 		"text_primary_light": "#111827",
-		"text_primary_dark": "#f9fafb",
 		"border": "#e5e7eb"
 	},
 	"layout": {

@@ -41,7 +41,6 @@ An Internal Team Dashboard with AI Assistant built for a coding challenge. This 
 ✅ **Additional Features**
 
 - Responsive design (mobile and desktop)
-- Dark mode support
 - Pin/unpin Q&A items
 - Search functionality in knowledge base
 - Keyboard shortcuts (Enter to submit, Shift+Enter for new line)
@@ -282,7 +281,6 @@ The schema uses Mongoose for:
 ✅ Error handling works (invalid API key, network errors)
 ✅ Responsive design works on mobile
 ✅ Database persists across page refreshes
-✅ Dark mode support
 
 ## Development Time
 

@@ -5,7 +5,6 @@ import defaultTheme from 'tailwindcss/defaultTheme'
 
 const config: Config = {
 	content: ['./src/**/*.{js,ts,jsx,tsx,mdx}'],
-	darkMode: 'class',
 	theme: {
 		screens: {
 			sm: '640px',
@@ -45,7 +44,7 @@ const config: Config = {
 			// ✅ Background and UI
 			background: '#ff8200',
 			foo: '#ffffff',
-			card: { DEFAULT: '#ffffff', dark: '#111827' },
+			card: '#ffffff',
 			border: '#e5e7eb',
 
 			// ✅ Custom brand hues
@@ -104,7 +103,6 @@ const config: Config = {
 
 			// ✅ Background modes
 			'background-light': '#F8FAFC',
-			'background-dark': '#18181B',
 
 			// ✅ Chart placeholders
 			chart: {
