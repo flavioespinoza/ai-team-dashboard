@@ -1,5 +1,13 @@
 # AI Team Dashboard
 
+[![Next.js](https://img.shields.io/badge/Next.js-16.0.1-black?style=flat&logo=next.js&logoColor=white)](https://nextjs.org/)
+[![React](https://img.shields.io/badge/React-19.2.0-61DAFB?style=flat&logo=react&logoColor=black)](https://reactjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.x-38B2AC?style=flat&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-8.19.2-47A248?style=flat&logo=mongodb&logoColor=white)](https://www.mongodb.com/)
+[![Node.js](https://img.shields.io/badge/Node.js-18+-339933?style=flat&logo=node.js&logoColor=white)](https://nodejs.org/)
+[![License](https://img.shields.io/badge/License-Educational-blue?style=flat)](LICENSE)
+
 An Internal Team Dashboard with AI Assistant built for a coding challenge. This application allows team members to ask questions to an AI assistant, view conversation history, and save valuable Q&A pairs to a searchable knowledge base.
 
 ## Features Implemented
