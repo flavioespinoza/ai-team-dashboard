@@ -53,7 +53,7 @@ export function MessageComponent({ message, previousMessage }: MessageProps) {
 		<div className={`flex gap-3 ${isUser ? 'justify-end' : 'justify-start'}`}>
 			<div
 				className={`max-w-[80%] rounded-lg p-4 ${
-					isUser ? 'bg-blue-600 text-white' : 'bg-[var(--surface)] bg-gray-100 text-gray-900'
+					isUser ? 'bg-secondary-200 text-secondary-900' : 'bg-primary-200 text-primary-900'
 				}`}
 			>
 				<div className="mb-2">
