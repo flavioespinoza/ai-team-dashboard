@@ -112,7 +112,7 @@ ai-team-dashboard/
 ### 1. Clone the Repository
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/flavioespinoza/ai-team-dashboard.git
 cd ai-team-dashboard
 ```
 
