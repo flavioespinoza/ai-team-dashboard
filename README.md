@@ -60,7 +60,7 @@ An Internal Team Dashboard with AI Assistant built for a coding challenge. This 
 - **AI API**: OpenAI API (GPT-4o-mini)
 - **Markdown**: react-markdown
 - **Code Formatting**: Prettier with custom configuration
-- **Package Manager**: npm
+- **Package Manager**: yarn (npm also supported)
 
 ## Project Structure
 
@@ -105,7 +105,7 @@ ai-team-dashboard/
 
 ### Prerequisites
 
-- Node.js 18+ and npm
+- Node.js 18+ and yarn (or npm)
 - MongoDB Atlas account (free tier available)
 - OpenAI API key
 
@@ -119,6 +119,8 @@ cd ai-team-dashboard
 ### 2. Install Dependencies
 
 ```bash
+yarn install
+# or
 npm install
 ```
 
@@ -163,6 +165,8 @@ MONGODB_DB=ai_team_dashboard
 ### 6. Run the Development Server
 
 ```bash
+yarn dev
+# or
 npm run dev
 ```
 
@@ -171,11 +175,11 @@ Open http://localhost:3000 in your browser.
 ## Available Scripts
 
 ```bash
-npm run dev          # Start development server
-npm run build        # Build for production
-npm start            # Start production server
-npm run lint         # Run ESLint
-npm run clean        # Format code with Prettier
+yarn dev             # Start development server (or: npm run dev)
+yarn build           # Build for production (or: npm run build)
+yarn start           # Start production server (or: npm start)
+yarn lint            # Run ESLint (or: npm run lint)
+yarn clean           # Format code with Prettier (or: npm run clean)
 ```
 
 ## Code Style
@@ -189,7 +193,7 @@ This project follows strict code style rules enforced by Prettier:
 - **Arrow function params** always wrapped in parentheses
 - **Max line length**: 100 characters
 
-Run `npm run clean` to format all code according to these rules.
+Run `yarn clean` (or `npm run clean`) to format all code according to these rules.
 
 ## Design Decisions & Architecture
 
@@ -334,18 +338,31 @@ The schema uses Mongoose for:
 
 ### Build Errors
 
-- Run `npm install` to ensure all dependencies are installed
-- Delete `.next` folder and rebuild: `rm -rf .next && npm run build`
-- Check for TypeScript errors: `npm run build`
+- Run `yarn install` (or `npm install`) to ensure all dependencies are installed
+- Delete `.next` folder and rebuild: `rm -rf .next && yarn build`
+- Check for TypeScript errors: `yarn build`
 
 ### Formatting Issues
 
-- Run `npm run clean` to format all code with Prettier
+- Run `yarn clean` (or `npm run clean`) to format all code with Prettier
 - Check that `.prettierrc` exists in the project root
 
 ## License
 
 This project is created for a coding challenge and is available for educational purposes.
+
+## How This Project Was Built
+
+This project was built using **Claude Code**, Anthropic's official CLI tool for Claude. The entire implementation process was guided by a comprehensive AI prompt that defined the architecture, tech stack, and implementation phases.
+
+### Build Process
+
+- **Tool**: Claude Code (Anthropic's AI-powered development assistant)
+- **Development Time**: ~4-5 hours
+- **Methodology**: Phase-by-phase implementation following a structured prompt
+- **Original Prompt**: Available in [`docs/ai-prompt.md`](./docs/ai-prompt.md)
+
+The prompt document includes detailed implementation instructions, code style requirements, and phase-by-phase development guidelines that were used to build this application from scratch.
 
 ## Contributing
 
@@ -353,4 +370,4 @@ This is a coding challenge project. For questions or feedback, please contact th
 
 ---
 
-Built with ❤️ using Next.js 15, React 19, TypeScript, Tailwind CSS 4, Recoil, MongoDB, and OpenAI API.
+Built with ❤️ using Next.js 15, React 19, TypeScript, Tailwind CSS 4, Jotai, MongoDB, and OpenAI API.
