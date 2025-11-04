@@ -100,7 +100,7 @@ export function ChatInterface() {
 				<div className="flex items-center justify-between">
 					<CardTitle>AI Assistant</CardTitle>
 					<Button
-						variant="outline"
+						variant="secondary"
 						size="sm"
 						onClick={handleNewChat}
 						disabled={messages.length === 0}
@@ -161,7 +161,7 @@ export function ChatInterface() {
 						className="min-h-[80px] resize-none"
 						disabled={isSubmitting}
 					/>
-					<Button type="submit" disabled={!question.trim() || isSubmitting} className="self-end">
+					<Button variant="primary" type="submit" disabled={!question.trim() || isSubmitting} className="self-end">
 						{isSubmitting ? 'Sending...' : 'Ask'}
 					</Button>
 				</form>

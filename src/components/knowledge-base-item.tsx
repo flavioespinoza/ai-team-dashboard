@@ -1,5 +1,5 @@
 // Date: 2025-11-04
-// Version: 1.0.0
+// Version: 1.1.0 — switched to DeleteConfirmDialog
 
 'use client'
 
@@ -11,6 +11,7 @@ import { useSetAtom } from 'jotai'
 import { Badge } from './ui/badge'
 import { Button } from './ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
+import DeleteConfirmDialog from './ui/delete-confirm-dialog' // ✅ import your dialog
 
 interface KnowledgeBaseItemProps {
 	item: KnowledgeBaseItem
@@ -22,15 +23,11 @@ export function KnowledgeBaseItemComponent({ item }: KnowledgeBaseItemProps) {
 	const [isTogglingPin, setIsTogglingPin] = useState(false)
 	const setKnowledgeBase = useSetAtom(knowledgeBaseState)
 
+	// ✅ Wrapped delete logic (no built-in confirm)
 	const handleDelete = async () => {
-		if (!confirm('Are you sure you want to delete this item?')) {
-			return
-		}
-
 		setIsDeleting(true)
 		try {
 			const result = await deleteKnowledgeBaseItem(item._id)
-
 			if (result.success) {
 				setKnowledgeBase((prev) => prev.filter((i) => i._id !== item._id))
 			}
@@ -45,10 +42,11 @@ export function KnowledgeBaseItemComponent({ item }: KnowledgeBaseItemProps) {
 		setIsTogglingPin(true)
 		try {
 			const result = await togglePinItem(item._id)
-
 			if (result.success && result.data) {
 				setKnowledgeBase((prev) =>
-					prev.map((i) => (i._id === item._id ? { ...i, isPinned: result.data!.isPinned } : i))
+					prev.map((i) =>
+						i._id === item._id ? { ...i, isPinned: result.data!.isPinned } : i
+					)
 				)
 			}
 		} catch (error) {
@@ -58,7 +56,8 @@ export function KnowledgeBaseItemComponent({ item }: KnowledgeBaseItemProps) {
 		}
 	}
 
-	const answerPreview = item.answer.length > 150 ? `${item.answer.slice(0, 150)}...` : item.answer
+	const answerPreview =
+		item.answer.length > 150 ? `${item.answer.slice(0, 150)}...` : item.answer
 
 	const createdAt = new Date(item.createdAt).toLocaleDateString('en-US', {
 		month: 'short',
@@ -81,35 +80,40 @@ export function KnowledgeBaseItemComponent({ item }: KnowledgeBaseItemProps) {
 						>
 							{item.isPinned ? '📌' : '📍'}
 						</Button>
-						<Button
-							size="sm"
-							variant="ghost"
-							onClick={handleDelete}
-							disabled={isDeleting}
-							className="h-8 w-8 p-0 text-red-600 hover:bg-red-50 hover:text-red-700"
-						>
-							🗑️
-						</Button>
+
+						{/* ✅ DeleteConfirmDialog replaces confirm() */}
+						<DeleteConfirmDialog
+							onConfirm={handleDelete}
+							title="Delete Knowledge Base Item?"
+							description={`Are you sure you want to delete “${item.question}”? This action cannot be undone.`}
+							trigger={
+								<Button
+									size="sm"
+									variant="ghost"
+									disabled={isDeleting}
+									className="h-8 w-8 p-0 text-red-600 hover:bg-red-50 hover:text-red-700"
+								>
+									🗑️
+								</Button>
+							}
+						/>
 					</div>
 				</div>
+
 				<div className="flex flex-wrap gap-2">
 					{item.isPinned && <Badge variant="warning">Pinned</Badge>}
-					{item.tags && item.tags.length > 0 && (
-						<>
-							{item.tags.map((tag) => (
-								<Badge key={tag} variant="secondary">
-									{tag}
-								</Badge>
-							))}
-						</>
-					)}
+					{item.tags?.map((tag) => (
+						<Badge key={tag} variant="secondary">
+							{tag}
+						</Badge>
+					))}
 				</div>
 			</CardHeader>
+
 			<CardContent>
 				<div className="mb-2">
 					{isExpanded ? (
 						<ReactMarkdown
-							className="prose prose-sm dark:prose-invert max-w-none"
 							components={{
 								p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
 								code: ({ children }) => (
@@ -127,12 +131,19 @@ export function KnowledgeBaseItemComponent({ item }: KnowledgeBaseItemProps) {
 							{item.answer}
 						</ReactMarkdown>
 					) : (
-						<p className="text-sm text-gray-600 dark:text-gray-400">{answerPreview}</p>
+						<p className="text-sm text-gray-600 dark:text-gray-400">
+							{answerPreview}
+						</p>
 					)}
 				</div>
+
 				<div className="flex items-center justify-between">
 					<span className="text-xs text-gray-500">{createdAt}</span>
-					<Button size="sm" variant="ghost" onClick={() => setIsExpanded(!isExpanded)}>
+					<Button
+						size="sm"
+						variant="ghost"
+						onClick={() => setIsExpanded(!isExpanded)}
+					>
 						{isExpanded ? 'Show less' : 'Show more'}
 					</Button>
 				</div>

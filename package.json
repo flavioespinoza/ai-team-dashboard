@@ -10,6 +10,7 @@
 		"clean": "prettier --write ."
 	},
 	"dependencies": {
+		"@radix-ui/react-dialog": "^1.1.15",
 		"clsx": "^2.1.1",
 		"fluid-tailwind": "^1.0.4",
 		"jotai": "^2.15.1",

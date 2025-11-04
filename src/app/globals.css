@@ -1,43 +1,75 @@
 @import 'tailwindcss';
 
 :root {
-	--background: #ffffff;
-	--foreground: #171717;
+  --background: #ffffff;
+  --foreground: #171717;
 }
 
+/* Tailwind v4 source of truth */
 @theme inline {
-	--color-background: var(--background);
-	--color-foreground: var(--foreground);
-	--font-sans: var(--font-geist-sans);
-	--font-mono: var(--font-geist-mono);
+  /* base text/background */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  /* PRIMARY = cblue */
+  --color-primary-50:  #f4f8fb;
+  --color-primary-100: #e8f0f6;
+  --color-primary-200: #cddfea;
+  --color-primary-300: #a1c4d8;
+  --color-primary-400: #6ea5c2;
+  --color-primary-500: #4c8bab;  /* <- cblue */
+  --color-primary-600: #3f7699;  /* darker hover */
+  --color-primary-700: #366582;
+  --color-primary-800: #2e566e;
+  --color-primary-900: #284a5e;
+
+  /* SECONDARY = hotpink */
+  --color-secondary-50:  #fff1f3;
+  --color-secondary-100: #ffe0e5;
+  --color-secondary-200: #ffc5cf;
+  --color-secondary-300: #ff9dad;
+  --color-secondary-400: #ff657f;
+  --color-secondary-500: #fe3557; /* <- hotpink */
+  --color-secondary-600: #ec163a; /* darker hover */
+  --color-secondary-700: #c70e2d;
+  --color-secondary-800: #a41029;
+  --color-secondary-900: #881427;
+
+  /* TERTIARY = sage */
+  --color-tertiary-50:  #f4f5f4;
+  --color-tertiary-100: #e6e8e3;
+  --color-tertiary-200: #ced1c9;
+  --color-tertiary-300: #aab1a4;
+  --color-tertiary-400: #808a78;
+  --color-tertiary-500: #636e5b; /* <- sage */
+  --color-tertiary-600: #4b5645; /* darker hover */
+  --color-tertiary-700: #3c4438;
+  --color-tertiary-800: #31372e;
+  --color-tertiary-900: #292e26;
+
+  /* optional: separate danger that matches hotpink */
+  --color-danger-500: #fe3557;
+  --color-danger-600: #ec163a;
+
+  /* fonts */
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
 }
 
 @media (prefers-color-scheme: dark) {
-	:root {
-		--background: #0a0a0a;
-		--foreground: #ededed;
-	}
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
 }
 
 body {
-	background: var(--background);
-	color: var(--foreground);
-	font-family: Arial, Helvetica, sans-serif;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans, Arial, Helvetica, sans-serif);
 }
 
-/* markdown parent div */
-.markdown-parent-element > * {
-	display: block !important;
-	margin-bottom: 20px !important;
-}
-
-/* for lists */
-.markdown-parent-element > ol > li {
-	display: block !important;
-	margin-bottom: 20px !important;
-}
-
-.markdown-parent-element > ul > li {
-	display: block !important;
-	margin-bottom: 20px !important;
-}
+/* markdown helpers */
+.markdown-parent-element > * { display:block !important; margin-bottom:20px !important; }
+.markdown-parent-element > ol > li,
+.markdown-parent-element > ul > li { display:block !important; margin-bottom:20px !important; }
