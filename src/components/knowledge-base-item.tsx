@@ -7,7 +7,7 @@ import { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { deleteKnowledgeBaseItem, togglePinItem } from '@/app/actions'
 import { type KnowledgeBaseItem, knowledgeBaseState } from '@/state/atoms'
-import { useSetRecoilState } from 'recoil'
+import { useSetAtom } from 'jotai'
 import { Badge } from './ui/badge'
 import { Button } from './ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
@@ -20,7 +20,7 @@ export function KnowledgeBaseItemComponent({ item }: KnowledgeBaseItemProps) {
 	const [isExpanded, setIsExpanded] = useState(false)
 	const [isDeleting, setIsDeleting] = useState(false)
 	const [isTogglingPin, setIsTogglingPin] = useState(false)
-	const setKnowledgeBase = useSetRecoilState(knowledgeBaseState)
+	const setKnowledgeBase = useSetAtom(knowledgeBaseState)
 
 	const handleDelete = async () => {
 		if (!confirm('Are you sure you want to delete this item?')) {

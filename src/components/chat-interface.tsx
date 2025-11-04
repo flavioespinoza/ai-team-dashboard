@@ -6,7 +6,7 @@
 import { FormEvent, useEffect, useRef, useState } from 'react'
 import { askAssistant } from '@/app/actions'
 import { isLoadingState, messagesState } from '@/state/atoms'
-import { useRecoilState, useRecoilValue } from 'recoil'
+import { useAtom, useAtomValue } from 'jotai'
 import { MessageComponent } from './message'
 import { Button } from './ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
@@ -14,8 +14,8 @@ import { Textarea } from './ui/input'
 import { ScrollArea } from './ui/scroll-area'
 
 export function ChatInterface() {
-	const [messages, setMessages] = useRecoilState(messagesState)
-	const isLoading = useRecoilValue(isLoadingState)
+	const [messages, setMessages] = useAtom(messagesState)
+	const isLoading = useAtomValue(isLoadingState)
 	const [question, setQuestion] = useState('')
 	const [error, setError] = useState<string | null>(null)
 	const [isSubmitting, setIsSubmitting] = useState(false)

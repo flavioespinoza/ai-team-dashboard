@@ -4,16 +4,15 @@
 'use client'
 
 import { useState } from 'react'
-import { knowledgeBaseState } from '@/state/atoms'
 import { sortedWithPinnedFirstSelector } from '@/state/selectors'
-import { useRecoilValue } from 'recoil'
+import { useAtomValue } from 'jotai'
 import { KnowledgeBaseItemComponent } from './knowledge-base-item'
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
 import { Input } from './ui/input'
 import { ScrollArea } from './ui/scroll-area'
 
 export function KnowledgeBaseSidebar() {
-	const knowledgeBaseItems = useRecoilValue(sortedWithPinnedFirstSelector)
+	const knowledgeBaseItems = useAtomValue(sortedWithPinnedFirstSelector)
 	const [searchQuery, setSearchQuery] = useState('')
 
 	// Filter items based on search query

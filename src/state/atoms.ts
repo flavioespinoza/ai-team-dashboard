@@ -1,6 +1,6 @@
 // Date: 2025-11-04
 // Version: 1.0.0
-import { atom } from 'recoil'
+import { atom } from 'jotai'
 
 export type Message = {
 	id: string
@@ -19,22 +19,10 @@ export type KnowledgeBaseItem = {
 	updatedAt: Date
 }
 
-export const messagesState = atom<Message[]>({
-	key: 'messagesState',
-	default: []
-})
+export const messagesState = atom<Message[]>([])
 
-export const knowledgeBaseState = atom<KnowledgeBaseItem[]>({
-	key: 'knowledgeBaseState',
-	default: []
-})
+export const knowledgeBaseState = atom<KnowledgeBaseItem[]>([])
 
-export const isLoadingState = atom<boolean>({
-	key: 'isLoadingState',
-	default: false
-})
+export const isLoadingState = atom<boolean>(false)
 
-export const selectedKnowledgeItemState = atom<KnowledgeBaseItem | null>({
-	key: 'selectedKnowledgeItemState',
-	default: null
-})
+export const selectedKnowledgeItemState = atom<KnowledgeBaseItem | null>(null)

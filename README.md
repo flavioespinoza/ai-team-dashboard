@@ -5,6 +5,7 @@ An Internal Team Dashboard with AI Assistant built for a coding challenge. This 
 ## Features Implemented
 
 ✅ **AI Assistant Chat Interface**
+
 - Real-time conversation with AI assistant powered by OpenAI GPT-4o-mini
 - Text input with "Ask Assistant" button
 - Display conversation messages (user questions + AI answers)
@@ -13,6 +14,7 @@ An Internal Team Dashboard with AI Assistant built for a coding challenge. This 
 - "Save to Knowledge Base" button on each AI response
 
 ✅ **Knowledge Base Sidebar**
+
 - Display all saved Q&A pairs
 - Question as title with answer preview
 - Click to expand/collapse full Q&A
@@ -23,18 +25,21 @@ An Internal Team Dashboard with AI Assistant built for a coding challenge. This 
 - Sorted by most recent with pinned items first
 
 ✅ **Data Persistence**
+
 - MongoDB database with Mongoose ODM
 - Collection: `knowledge_base`
-- Schema: _id, question, answer, tags, isPinned, createdAt, updatedAt
+- Schema: \_id, question, answer, tags, isPinned, createdAt, updatedAt
 - All data persists across sessions
 
 ✅ **AI Integration**
+
 - OpenAI API with GPT-4o-mini model
 - Server Actions for API calls (not API routes)
 - Proper error handling and validation with Zod
 - Environment variables for API keys
 
 ✅ **Additional Features**
+
 - Responsive design (mobile and desktop)
 - Dark mode support
 - Pin/unpin Q&A items
@@ -192,6 +197,7 @@ Run `npm run clean` to format all code according to these rules.
 ### Why Recoil for State Management?
 
 Recoil was chosen over Redux or Context API for several reasons:
+
 - **Minimal boilerplate**: Simple atom-based state definition
 - **Excellent TypeScript support**: Type-safe state management
 - **Granular updates**: Components only re-render when their specific atoms change
@@ -201,6 +207,7 @@ Recoil was chosen over Redux or Context API for several reasons:
 ### Server Actions vs API Routes
 
 Server Actions were chosen over traditional API routes because:
+
 - **Simplified data flow**: Direct function calls from client components
 - **Better TypeScript integration**: End-to-end type safety
 - **Reduced boilerplate**: No need to define routes, handle HTTP methods
@@ -210,6 +217,7 @@ Server Actions were chosen over traditional API routes because:
 ### Component Structure
 
 The component architecture follows atomic design principles:
+
 1. **UI Primitives** (`components/ui/`): Reusable, unstyled components
 2. **Feature Components** (`components/`): Business logic components
 3. **Page Components** (`app/page.tsx`): Layout and orchestration
@@ -217,12 +225,14 @@ The component architecture follows atomic design principles:
 ### MongoDB Schema Design
 
 The knowledge base schema is simple but extensible:
+
 - `question` and `answer`: Core Q&A content
 - `tags`: Array for categorization (future feature)
 - `isPinned`: Boolean for user-prioritized items
 - `timestamps`: Automatic createdAt/updatedAt tracking
 
 The schema uses Mongoose for:
+
 - Type validation
 - Default values
 - Automatic timestamp management

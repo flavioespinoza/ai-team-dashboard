@@ -8,10 +8,10 @@ import { getKnowledgeBase } from '@/app/actions'
 import { ChatInterface } from '@/components/chat-interface'
 import { KnowledgeBaseSidebar } from '@/components/knowledge-base-sidebar'
 import { knowledgeBaseState } from '@/state/atoms'
-import { useSetRecoilState } from 'recoil'
+import { useSetAtom } from 'jotai'
 
 export default function Home() {
-	const setKnowledgeBase = useSetRecoilState(knowledgeBaseState)
+	const setKnowledgeBase = useSetAtom(knowledgeBaseState)
 	const [isLoading, setIsLoading] = useState(true)
 	const [error, setError] = useState<string | null>(null)
 

@@ -7,7 +7,7 @@ import { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { saveToKnowledgeBase } from '@/app/actions'
 import { type Message, knowledgeBaseState } from '@/state/atoms'
-import { useSetRecoilState } from 'recoil'
+import { useSetAtom } from 'jotai'
 import { Button } from './ui/button'
 
 interface MessageProps {
@@ -18,7 +18,7 @@ interface MessageProps {
 export function MessageComponent({ message, previousMessage }: MessageProps) {
 	const [isSaving, setIsSaving] = useState(false)
 	const [saved, setSaved] = useState(false)
-	const setKnowledgeBase = useSetRecoilState(knowledgeBaseState)
+	const setKnowledgeBase = useSetAtom(knowledgeBaseState)
 
 	const handleSave = async () => {
 		if (!previousMessage || previousMessage.type !== 'user') {

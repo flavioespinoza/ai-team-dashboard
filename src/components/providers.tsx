@@ -3,8 +3,8 @@
 
 'use client'
 
-import { RecoilRoot } from 'recoil'
+import { Provider } from 'jotai'
 
 export function Providers({ children }: { children: React.ReactNode }) {
-	return <RecoilRoot>{children}</RecoilRoot>
+	return <Provider>{children}</Provider>
 }
