@@ -175,7 +175,7 @@ body {
 }
 
 .tooltip-text {
-	@apply invisible absolute -top-4 right-full translate-y-[-4px] whitespace-nowrap rounded-md bg-gray-800 px-2.5 py-1 text-xs text-white opacity-0 transition-all duration-150;
+	@apply invisible absolute -top-4 right-full translate-y-[-4px] rounded-md bg-gray-800 px-2.5 py-1 text-xs whitespace-nowrap text-white opacity-0 transition-all duration-150;
 }
 
 .tooltip:hover .tooltip-text,
@@ -183,32 +183,31 @@ body {
 	@apply visible translate-y-0 opacity-100;
 }
 
-
 /* =======================================
    Grow textarea automatically when typing
    ======================================= */
 .grow-wrap {
-  /* easy way to plop the elements on top of each other and have them both sized based on the tallest one's height */
-  display: grid;
+	/* easy way to plop the elements on top of each other and have them both sized based on the tallest one's height */
+	display: grid;
 }
 .grow-wrap::after {
-  /* Note the weird space! Needed to preventy jumpy behavior */
-  content: attr(data-replicated-value) " ";
+	/* Note the weird space! Needed to preventy jumpy behavior */
+	content: attr(data-replicated-value) ' ';
 
-  /* This is how textarea text behaves */
-  white-space: pre-wrap;
+	/* This is how textarea text behaves */
+	white-space: pre-wrap;
 
-  /* Hidden from view, clicks, and screen readers */
-  visibility: hidden;
+	/* Hidden from view, clicks, and screen readers */
+	visibility: hidden;
 }
 
 .grow-wrap > textarea,
 .grow-wrap::after {
-  /* Identical styling required!! */
-  border: 1px solid black;
-  padding: 0.5rem;
-  font: inherit;
+	/* Identical styling required!! */
+	border: 1px solid black;
+	padding: 0.5rem;
+	font: inherit;
 
-  /* Place on top of each other */
-  grid-area: 1 / 1 / 2 / 2;
+	/* Place on top of each other */
+	grid-area: 1 / 1 / 2 / 2;
 }

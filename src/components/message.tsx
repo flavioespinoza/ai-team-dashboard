@@ -53,7 +53,7 @@ export function MessageComponent({ message, previousMessage }: MessageProps) {
 		<div className={`flex gap-3 ${isUser ? 'justify-end' : 'justify-start'}`}>
 			<div
 				className={`max-w-[80%] rounded-lg p-4 ${
-					isUser ? 'bg-secondary-200 text-secondary-900' : 'bg-primary-200 text-primary-900'
+					isUser ? 'bg-tertiary-200 text-tertiary-900' : 'bg-primary-200 text-primary-900'
 				}`}
 			>
 				<div className="mb-2">
@@ -104,10 +104,10 @@ export function MessageComponent({ message, previousMessage }: MessageProps) {
 					{!isUser && previousMessage && (
 						<Button
 							size="sm"
-							variant="ghost"
+							variant="outline"
 							onClick={handleSave}
 							disabled={isSaving || saved}
-							className="text-xs"
+							className="bg-gray-100/75 text-xs hover:bg-white hover:text-gray-900"
 						>
 							{saved ? 'Saved' : isSaving ? 'Saving...' : 'Save to Knowledge Base'}
 						</Button>

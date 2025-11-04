@@ -73,17 +73,21 @@ export function KnowledgeBaseItemComponent({ item }: KnowledgeBaseItemProps) {
 				<div className="flex items-start justify-between gap-2">
 					<CardTitle className="line-clamp-2 text-base">{item.question}</CardTitle>
 					<div className="flex gap-1">
-						<div className='tooltip'>
+						<div className="tooltip">
 							<Button
-							size="sm"
-							variant="ghost"
-							onClick={handleTogglePin}
-							disabled={isTogglingPin}
-							className="h-8 w-8 p-1 hover:bg-gray-200 hover:text-gray-700"
-						>
-							{item.isPinned ? <PinOff /> : <Pin />}
-						</Button>
-						{item.isPinned ? <span className="tooltip-text">Unpin Knowledge Base</span> : <span className="tooltip-text">Pin Knowledge Base</span>}
+								size="sm"
+								variant="ghost"
+								onClick={handleTogglePin}
+								disabled={isTogglingPin}
+								className="h-8 w-8 p-1 hover:bg-gray-200 hover:text-gray-700"
+							>
+								{item.isPinned ? <PinOff /> : <Pin />}
+							</Button>
+							{item.isPinned ? (
+								<span className="tooltip-text">Unpin Knowledge Base</span>
+							) : (
+								<span className="tooltip-text">Pin Knowledge Base</span>
+							)}
 						</div>
 
 						{/* ✅ DeleteConfirmDialog replaces confirm() */}
