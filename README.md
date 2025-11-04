@@ -7,7 +7,7 @@ An Internal Team Dashboard with AI Assistant built for a coding challenge. This 
 ✅ **AI Assistant Chat Interface**
 
 - Real-time conversation with AI assistant powered by OpenAI GPT-4o-mini
-- Text input with "Ask Assistant" button
+- Text input with "Ask" button
 - Display conversation messages (user questions + AI answers)
 - Loading state during AI response generation
 - Markdown rendering for formatted answers
