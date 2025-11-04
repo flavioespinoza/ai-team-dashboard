@@ -255,7 +255,7 @@ The schema uses Mongoose for:
 
 ### Saving to Knowledge Base
 
-1. After receiving an AI response, click the "Save to KB" button on that message
+1. After receiving an AI response, click the "Save to Knowledge Base" button on that message
 2. The Q&A pair will be automatically saved to the knowledge base
 3. The saved item will appear in the sidebar (or below on mobile)
 
