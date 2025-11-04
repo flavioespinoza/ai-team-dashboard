@@ -56,7 +56,7 @@ export function MessageComponent({ message, previousMessage }: MessageProps) {
 			>
 				<div className="mb-2">
 					<ReactMarkdown
-						className="prose prose-sm dark:prose-invert max-w-none"
+						
 						components={{
 							p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
 							code: ({ children }) => (
