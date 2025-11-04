@@ -154,7 +154,6 @@ export function ChatInterface() {
 						onChange={(e) => setQuestion(e.target.value)}
 						onKeyDown={handleKeyDown}
 						placeholder="Ask a question... (Press Enter to send, Shift+Enter for new line)"
-						className="min-h-[80px] resize-none"
 						disabled={isSubmitting}
 					/>
 					<Button
