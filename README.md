@@ -13,7 +13,7 @@ Read how I used Claude Code AI as a force multiplier to build this project in on
 ✅ **AI Assistant Chat Interface**
 
 - Real-time conversation with AI assistant powered by OpenAI GPT-4o-mini
-- Text input with "Ask Assistant" button
+- Text input with "Ask" button
 - Display conversation messages (user questions + AI answers)
 - Loading state during AI response generation
 - Markdown rendering for formatted answers
@@ -118,7 +118,7 @@ ai-team-dashboard/
 ### 1. Clone the Repository
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/flavioespinoza/ai-team-dashboard.git
 cd ai-team-dashboard
 ```
 
@@ -261,7 +261,7 @@ The schema uses Mongoose for:
 
 ### Saving to Knowledge Base
 
-1. After receiving an AI response, click the "Save to KB" button on that message
+1. After receiving an AI response, click the "Save to Knowledge Base" button on that message
 2. The Q&A pair will be automatically saved to the knowledge base
 3. The saved item will appear in the sidebar (or below on mobile)
 
