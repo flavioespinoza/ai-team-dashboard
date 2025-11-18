@@ -572,15 +572,16 @@ ai-team-dashboard/
 
 ## Testing Checklist
 - [x] Can ask a question and receive AI response
-- [ ] Messages display in conversation list
+- [x] Messages display in conversation list
 - [x] Can save AI answer to knowledge base
-- [ ] Saved items appear in sidebar
-- [ ] Can click saved item to view full Q&A
-- [ ] Can delete saved items
-- [ ] Loading states work correctly
-- [ ] Error handling works (try invalid API key)
-- [ ] Responsive design works on mobile
-- [ ] Database persists across page refreshes
+- [x] Saved items appear in sidebar
+- [x] Can click saved item to view full Q&A
+- [x] Can delete saved items
+- [x] Loading states work correctly
+- [x] Error handling works (try invalid API key)
+- [x] Responsive design works on mobile
+- [x] Database persists across page refreshes on localhost
+- [ ] Database persists across page refreshes on production
 
 ## README Requirements
 Include in README.md:
