@@ -2,7 +2,7 @@
 
 An Internal Team Dashboard with AI Assistant built for a coding challenge. This application allows team members to ask questions to an AI assistant, view conversation history, and save valuable Q&A pairs to a searchable knowledge base.
 
-## Using Claude Code AI to help build this project
+## Using AI to help build this project
 
 Read how I used Claude Code AI as a force multiplier to build this project in only five hours.
 - [Story](docs/ai-story.md)
